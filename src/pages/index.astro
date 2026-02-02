@@ -1,0 +1,388 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Barbacane - The Spec-Driven API Gateway">
+  <!-- Hero Section -->
+  <section class="section relative overflow-hidden">
+    <div class="absolute inset-0 hero-gradient"></div>
+    <div class="container-custom relative">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background-light border border-themed mb-8">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span class="text-sm text-foreground-muted">Open Source &middot; Apache 2.0</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
+          Your spec is your
+          <span class="text-gradient">gateway</span>
+        </h1>
+
+        <p class="text-lg sm:text-xl text-foreground-muted max-w-2xl mx-auto mb-10">
+          Stop maintaining two sources of truth. Barbacane uses your OpenAPI specification
+          as the single source of truth for routing, validation, authentication, and more.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#get-started" class="btn-primary text-lg px-8 py-4">
+            Get Started
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+            </svg>
+          </a>
+          <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="btn-secondary text-lg px-8 py-4">
+            <svg class="mr-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem Section -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12">
+          The <span class="text-accent">problem</span> with traditional API gateways
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="card border-error/20">
+            <div class="w-12 h-12 rounded-lg bg-error-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Two sources of truth</h3>
+            <p class="text-foreground-muted">
+              Your OpenAPI spec defines your API, but your gateway has its own configuration.
+              They inevitably diverge, causing bugs and security issues.
+            </p>
+          </div>
+
+          <div class="card border-error/20">
+            <div class="w-12 h-12 rounded-lg bg-error-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Wasted time reconciling</h3>
+            <p class="text-foreground-muted">
+              Teams spend hours syncing gateway config with API specs, debugging mismatches,
+              and fixing inconsistencies that shouldn't exist.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solution Section -->
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          The <span class="text-gradient">Barbacane</span> approach
+        </h2>
+        <p class="text-xl text-foreground-muted">
+          One spec. Zero configuration drift. Automatic enforcement.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="card text-center">
+          <div class="w-16 h-16 rounded-2xl bg-primary-subtle flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl">1</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Write your OpenAPI spec</h3>
+          <p class="text-foreground-muted">
+            Add <code class="text-primary">x-barbacane-*</code> extensions for auth, rate limiting,
+            and routing. Your spec is now complete.
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div class="w-16 h-16 rounded-2xl bg-secondary-subtle flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl">2</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Compile to an artifact</h3>
+          <p class="text-foreground-muted">
+            Run <code class="text-secondary">barbacane compile</code> to generate an optimized
+            binary artifact. Validation happens at compile time.
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div class="w-16 h-16 rounded-2xl bg-accent-subtle flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl">3</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Deploy and run</h3>
+          <p class="text-foreground-muted">
+            Deploy the artifact to your gateway. Routing, validation, auth &mdash; everything
+            works exactly as specified.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          Everything you need in an API gateway
+        </h2>
+        <p class="text-xl text-foreground-muted">
+          Built in Rust for speed and safety. Extended with WebAssembly for flexibility.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Request Validation</h3>
+          <p class="text-foreground-muted">
+            Automatic JSON Schema validation for bodies, parameters, and headers.
+            Invalid requests never reach your backend.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Authentication</h3>
+          <p class="text-foreground-muted">
+            Built-in JWT, API Key, and OAuth2 authentication. Configured directly
+            in your OpenAPI security schemes.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Blazing Fast</h3>
+          <p class="text-foreground-muted">
+            Route lookup in ~83ns. Full validation in ~1.2µs. Built on Rust, Tokio,
+            and Hyper for maximum performance.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">WASM Plugins</h3>
+          <p class="text-foreground-muted">
+            Extend functionality with WebAssembly plugins. Sandboxed execution means
+            plugins can't crash your gateway.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Observability</h3>
+          <p class="text-foreground-muted">
+            Prometheus metrics, OpenTelemetry traces, and structured logging.
+            Full visibility into your API traffic.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Event-Driven</h3>
+          <p class="text-foreground-muted">
+            AsyncAPI support for event-driven architectures. Dispatch to Kafka, NATS,
+            or invoke AWS Lambda functions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use Cases Section -->
+  <section id="use-cases" class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          Built for teams who take APIs seriously
+        </h2>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div class="card">
+          <h3 class="text-2xl font-bold mb-4 text-primary">Platform Teams</h3>
+          <p class="text-foreground-muted mb-6">
+            Building an internal developer platform? Barbacane enforces consistent API
+            standards and policies automatically.
+          </p>
+          <ul class="space-y-3 text-foreground-muted">
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Self-service API publishing</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Automatic policy enforcement</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Centralized observability</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3 class="text-2xl font-bold mb-4 text-secondary">API Product Companies</h3>
+          <p class="text-foreground-muted mb-6">
+            Exposing public APIs? Barbacane ensures your contracts are strictly enforced
+            and your documentation is always accurate.
+          </p>
+          <ul class="space-y-3 text-foreground-muted">
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Contract-first development</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Always-accurate documentation</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Version and lifecycle management</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3 class="text-2xl font-bold mb-4 text-accent">Enterprises Modernizing</h3>
+          <p class="text-foreground-muted mb-6">
+            Migrating from legacy gateways? Barbacane's spec-first approach brings
+            order to complex API landscapes.
+          </p>
+          <ul class="space-y-3 text-foreground-muted">
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Gradual migration path</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Compliance-ready logging</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Hybrid cloud support</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Open Source Section -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success-subtle border border-success/20 mb-8">
+          <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span class="text-sm text-success">100% Open Source</span>
+        </div>
+
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          No enterprise edition. No feature gating.
+        </h2>
+        <p class="text-xl text-foreground-muted max-w-2xl mx-auto mb-8">
+          Barbacane is fully open source under the Apache 2.0 license. Every feature is available
+          to everyone. We make money through consulting, support, and training &mdash; not by
+          holding features hostage.
+        </p>
+
+        <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="btn-secondary">
+          <svg class="mr-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          Star on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section id="get-started" class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <div class="card cta-gradient text-center p-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            Ready to simplify your API gateway?
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-2xl mx-auto mb-8">
+            Get started in minutes. Write your spec, compile, and deploy.
+          </p>
+
+          <div class="code-block rounded-lg p-4 mb-8 max-w-xl mx-auto">
+            <code class="text-sm sm:text-base font-mono">
+              <span class="text-foreground-muted"># Install Barbacane</span><br>
+              <span class="text-primary">cargo</span> install barbacane<br><br>
+              <span class="text-foreground-muted"># Compile your spec</span><br>
+              <span class="text-primary">barbacane</span> compile api.yaml -o api.bca<br><br>
+              <span class="text-foreground-muted"># Run the gateway</span><br>
+              <span class="text-primary">barbacane</span> run api.bca
+            </code>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="https://docs.barbacane.dev/getting-started" class="btn-primary text-lg px-8 py-4">
+              Read the docs
+            </a>
+            <a href="/pricing" class="btn-secondary text-lg px-8 py-4">
+              Need help? Talk to us
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

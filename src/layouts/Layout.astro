@@ -1,0 +1,122 @@
+---
+import ThemeToggle from '../components/ThemeToggle.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = "Barbacane - The spec-driven API gateway. Your spec is your gateway."
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <script is:inline>
+      // Prevent flash by setting theme immediately
+      const theme = localStorage.getItem('theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/logo.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+  </head>
+  <body>
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-bg backdrop-blur-lg border-b border-themed">
+      <div class="container-custom">
+        <div class="flex items-center justify-between h-16">
+          <a href="/" class="flex items-center gap-3">
+            <img src="/favicon.png" alt="Barbacane" class="h-8 w-8" />
+            <span class="font-bold text-xl text-gradient">Barbacane</span>
+          </a>
+
+          <div class="hidden md:flex items-center gap-8">
+            <a href="#features" class="text-foreground-muted hover:text-primary transition-colors">Features</a>
+            <a href="#use-cases" class="text-foreground-muted hover:text-primary transition-colors">Use Cases</a>
+            <a href="/pricing" class="text-foreground-muted hover:text-primary transition-colors">Services</a>
+            <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="text-foreground-muted hover:text-primary transition-colors">GitHub</a>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <ThemeToggle />
+            <a href="https://docs.barbacane.dev" class="btn-secondary hidden sm:inline-flex">Documentation</a>
+            <a href="#get-started" class="btn-primary">Get Started</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="pt-16">
+      <slot />
+    </main>
+
+    <footer class="border-t border-themed bg-background-light">
+      <div class="container-custom py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div class="md:col-span-2">
+            <a href="/" class="flex items-center gap-3 mb-4">
+              <img src="/favicon.png" alt="Barbacane" class="h-8 w-8" />
+              <span class="font-bold text-xl text-gradient">Barbacane</span>
+            </a>
+            <p class="text-foreground-muted max-w-md">
+              The spec-driven API gateway built in Rust. Your OpenAPI spec becomes your gateway configuration.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="font-semibold mb-4">Product</h4>
+            <ul class="space-y-2 text-foreground-muted">
+              <li><a href="#features" class="hover:text-primary transition-colors">Features</a></li>
+              <li><a href="https://docs.barbacane.dev" class="hover:text-primary transition-colors">Documentation</a></li>
+              <li><a href="https://github.com/barbacane-dev/barbacane" class="hover:text-primary transition-colors">GitHub</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-semibold mb-4">Services</h4>
+            <ul class="space-y-2 text-foreground-muted">
+              <li><a href="/pricing#consulting" class="hover:text-primary transition-colors">Consulting</a></li>
+              <li><a href="/pricing#support" class="hover:text-primary transition-colors">Pro Support</a></li>
+              <li><a href="/pricing#training" class="hover:text-primary transition-colors">Training</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-themed mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p class="text-foreground-muted text-sm">
+            &copy; {new Date().getFullYear()} Barbacane. Open source under Apache 2.0.
+          </p>
+          <p class="text-foreground-muted text-sm">
+            <a href="/trademarks" class="hover:text-primary transition-colors">Trademark Policy</a>
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+</style>
