@@ -8,8 +8,12 @@ interface Props {
 
 const {
   title,
-  description = "Barbacane - The spec-driven API gateway. Your spec is your gateway."
+  description = "Barbacane - The spec-driven API gateway built in Rust. Your OpenAPI and AsyncAPI specs become your gateway configuration."
 } = Astro.props;
+
+const siteUrl = 'https://barbacane.dev';
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
+const ogImage = `${siteUrl}/og-image.png`;
 ---
 
 <!doctype html>
@@ -29,19 +33,46 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="canonical" href={canonicalUrl} />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
     <!-- Open Graph -->
+    <meta property="og:site_name" content="Barbacane" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/logo.png" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Barbacane",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux, macOS, Windows",
+      "description": description,
+      "url": siteUrl,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Barbacane",
+        "url": siteUrl
+      }
+    })} />
   </head>
   <body>
     <nav class="fixed top-0 left-0 right-0 z-50 nav-bg backdrop-blur-lg border-b border-themed">
@@ -53,8 +84,8 @@ const {
           </a>
 
           <div class="hidden md:flex items-center gap-8">
-            <a href="#features" class="text-foreground-muted hover:text-primary transition-colors">Features</a>
-            <a href="#use-cases" class="text-foreground-muted hover:text-primary transition-colors">Use Cases</a>
+            <a href="/#features" class="text-foreground-muted hover:text-primary transition-colors">Features</a>
+            <a href="/#use-cases" class="text-foreground-muted hover:text-primary transition-colors">Use Cases</a>
             <a href="/pricing" class="text-foreground-muted hover:text-primary transition-colors">Services</a>
             <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="text-foreground-muted hover:text-primary transition-colors">GitHub</a>
           </div>
@@ -62,7 +93,7 @@ const {
           <div class="flex items-center gap-4">
             <ThemeToggle />
             <a href="https://docs.barbacane.dev" class="btn-secondary hidden sm:inline-flex">Documentation</a>
-            <a href="#get-started" class="btn-primary">Get Started</a>
+            <a href="/#get-started" class="btn-primary">Get Started</a>
           </div>
         </div>
       </div>
@@ -81,14 +112,14 @@ const {
               <span class="font-bold text-xl text-gradient">Barbacane</span>
             </a>
             <p class="text-foreground-muted max-w-md">
-              The spec-driven API gateway built in Rust. Your OpenAPI spec becomes your gateway configuration.
+              The spec-driven API gateway built in Rust. Your OpenAPI and AsyncAPI specs become your gateway configuration.
             </p>
           </div>
 
           <div>
             <h4 class="font-semibold mb-4">Product</h4>
             <ul class="space-y-2 text-foreground-muted">
-              <li><a href="#features" class="hover:text-primary transition-colors">Features</a></li>
+              <li><a href="/#features" class="hover:text-primary transition-colors">Features</a></li>
               <li><a href="https://docs.barbacane.dev" class="hover:text-primary transition-colors">Documentation</a></li>
               <li><a href="https://github.com/barbacane-dev/barbacane" class="hover:text-primary transition-colors">GitHub</a></li>
             </ul>

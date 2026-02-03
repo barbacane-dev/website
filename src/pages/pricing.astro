@@ -73,8 +73,8 @@ import Layout from '../layouts/Layout.astro';
               </li>
             </ul>
           </div>
-          <a href="mailto:contact@barbacane.dev?subject=Consulting%20inquiry" class="btn-primary w-full justify-center">
-            Get in touch
+          <a href="https://cal.com/nicolas-dreno-xijjpz/15min" target="_blank" rel="noopener" class="btn-primary w-full justify-center">
+            Book intro call
           </a>
         </div>
 
@@ -132,8 +132,8 @@ import Layout from '../layouts/Layout.astro';
               </li>
             </ul>
           </div>
-          <a href="mailto:contact@barbacane.dev?subject=Pro%20Support%20inquiry" class="btn-primary shadow-glow-secondary w-full justify-center" style="background-color: var(--color-secondary);">
-            Get in touch
+          <a href="https://cal.com/nicolas-dreno-xijjpz/15min" target="_blank" rel="noopener" class="btn-primary shadow-glow-secondary w-full justify-center" style="background-color: var(--color-secondary);">
+            Book intro call
           </a>
         </div>
 
@@ -156,7 +156,7 @@ import Layout from '../layouts/Layout.astro';
                 </svg>
                 <div>
                   <strong class="text-foreground">Spec-driven API design</strong>
-                  <p class="text-sm text-foreground-muted">OpenAPI best practices and Barbacane extensions</p>
+                  <p class="text-sm text-foreground-muted">OpenAPI & AsyncAPI best practices with Barbacane extensions</p>
                 </div>
               </li>
               <li class="flex items-start gap-3">
@@ -188,8 +188,8 @@ import Layout from '../layouts/Layout.astro';
               </li>
             </ul>
           </div>
-          <a href="mailto:contact@barbacane.dev?subject=Training%20inquiry" class="btn-primary shadow-glow-accent w-full justify-center" style="background-color: var(--color-accent);">
-            Get in touch
+          <a href="https://cal.com/nicolas-dreno-xijjpz/15min" target="_blank" rel="noopener" class="btn-primary shadow-glow-accent w-full justify-center" style="background-color: var(--color-accent);">
+            Book intro call
           </a>
         </div>
       </div>
@@ -253,13 +253,53 @@ import Layout from '../layouts/Layout.astro';
         <p class="text-xl text-foreground-muted mb-8">
           Let's talk. We'll help you figure out the best path forward for your team.
         </p>
-        <a href="mailto:contact@barbacane.dev" class="btn-primary text-lg px-8 py-4">
-          Contact us
-          <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-          </svg>
-        </a>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <a href="https://cal.com/nicolas-dreno-xijjpz/15min" target="_blank" rel="noopener" class="btn-primary text-lg px-8 py-4">
+            <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            Book a 15-min call
+          </a>
+          <span class="text-foreground-muted">or</span>
+          <button data-email="contact@barbacane.dev" class="copy-email-btn btn-secondary text-lg px-8 py-4">
+            <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+            </svg>
+            <span class="btn-text">Copy email</span>
+            <span class="btn-copied hidden">Copied!</span>
+          </button>
+        </div>
+        <p class="text-sm text-foreground-muted mt-4">contact@barbacane.dev</p>
       </div>
     </div>
   </section>
 </Layout>
+
+<script>
+  document.querySelectorAll('.copy-email-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const email = btn.dataset.email || 'contact@barbacane.dev';
+      const subject = btn.dataset.subject;
+      const textToCopy = subject ? `${email} (Subject: ${subject})` : email;
+
+      try {
+        await navigator.clipboard.writeText(email);
+        const textSpan = btn.querySelector('.btn-text');
+        const copiedSpan = btn.querySelector('.btn-copied');
+
+        if (textSpan && copiedSpan) {
+          textSpan.classList.add('hidden');
+          copiedSpan.classList.remove('hidden');
+
+          setTimeout(() => {
+            textSpan.classList.remove('hidden');
+            copiedSpan.classList.add('hidden');
+          }, 2000);
+        }
+      } catch (err) {
+        // Fallback: open mailto if clipboard fails
+        window.location.href = `mailto:${email}${subject ? '?subject=' + encodeURIComponent(subject) : ''}`;
+      }
+    });
+  });
+</script>

@@ -38,6 +38,10 @@ src/
 public/             # Static assets
 ```
 
+## TODO
+
+- [ ] Create `public/og-image.png` (1200x630px) for social media sharing (Open Graph / Twitter cards)
+
 ## License
 
 Apache-2.0
