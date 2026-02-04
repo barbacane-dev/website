@@ -2,15 +2,13 @@
 ---
 
 <button
-  id="theme-toggle"
   type="button"
-  class="p-2 rounded-lg transition-colors duration-200 hover:bg-[var(--color-background-light)]"
+  class="theme-toggle p-2 rounded-lg transition-colors duration-200 hover:bg-[var(--color-background-light)]"
   aria-label="Toggle theme"
 >
   <!-- Sun icon (shown in dark mode) -->
   <svg
-    id="sun-icon"
-    class="w-5 h-5 hidden"
+    class="theme-sun-icon w-5 h-5 hidden"
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -24,8 +22,7 @@
   </svg>
   <!-- Moon icon (shown in light mode) -->
   <svg
-    id="moon-icon"
-    class="w-5 h-5 hidden"
+    class="theme-moon-icon w-5 h-5 hidden"
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -40,22 +37,39 @@
 </button>
 
 <script is:inline>
-  function updateThemeIcons() {
-    const isDark = document.documentElement.classList.contains('dark');
-    document.getElementById('sun-icon').classList.toggle('hidden', !isDark);
-    document.getElementById('moon-icon').classList.toggle('hidden', isDark);
+  // Only initialize once even if component appears multiple times
+  if (!window.themeToggleInitialized) {
+    window.themeToggleInitialized = true;
+
+    function updateAllThemeIcons() {
+      const isDark = document.documentElement.classList.contains('dark');
+      document.querySelectorAll('.theme-sun-icon').forEach(icon => {
+        icon.classList.toggle('hidden', !isDark);
+      });
+      document.querySelectorAll('.theme-moon-icon').forEach(icon => {
+        icon.classList.toggle('hidden', isDark);
+      });
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      document.documentElement.classList.toggle('dark', !isDark);
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+      updateAllThemeIcons();
+    }
+
+    function initThemeToggle() {
+      updateAllThemeIcons();
+      document.querySelectorAll('.theme-toggle').forEach(btn => {
+        btn.addEventListener('click', toggleTheme);
+      });
+    }
+
+    // Wait for DOM to be fully loaded before attaching handlers
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initThemeToggle);
+    } else {
+      initThemeToggle();
+    }
   }
-
-  function toggleTheme() {
-    const isDark = document.documentElement.classList.contains('dark');
-    document.documentElement.classList.toggle('dark', !isDark);
-    localStorage.setItem('theme', isDark ? 'light' : 'dark');
-    updateThemeIcons();
-  }
-
-  // Set initial state
-  updateThemeIcons();
-
-  // Add click handler
-  document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 </script>

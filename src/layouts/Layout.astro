@@ -83,6 +83,7 @@ const ogImage = `${siteUrl}/og-image.png`;
             <span class="font-bold text-xl text-gradient">Barbacane</span>
           </a>
 
+          <!-- Desktop navigation -->
           <div class="hidden md:flex items-center gap-8">
             <a href="/#features" class="text-foreground-muted hover:text-primary transition-colors">Features</a>
             <a href="/#use-cases" class="text-foreground-muted hover:text-primary transition-colors">Use Cases</a>
@@ -90,14 +91,77 @@ const ogImage = `${siteUrl}/og-image.png`;
             <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="text-foreground-muted hover:text-primary transition-colors">GitHub</a>
           </div>
 
-          <div class="flex items-center gap-4">
+          <!-- Desktop actions -->
+          <div class="hidden md:flex items-center gap-4">
             <ThemeToggle />
-            <a href="https://docs.barbacane.dev" class="btn-secondary hidden sm:inline-flex">Documentation</a>
+            <a href="https://docs.barbacane.dev" class="btn-secondary">Documentation</a>
             <a href="/#get-started" class="btn-primary">Get Started</a>
+          </div>
+
+          <!-- Mobile: burger button -->
+          <div class="flex md:hidden items-center">
+            <button
+              id="mobile-menu-btn"
+              class="p-2 text-foreground-muted hover:text-primary transition-colors"
+              aria-label="Toggle menu"
+              aria-expanded="false"
+            >
+              <svg class="w-6 h-6 burger-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+              <svg class="w-6 h-6 close-icon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
           </div>
         </div>
       </div>
+
+      <!-- Mobile menu -->
+      <div id="mobile-menu" class="hidden md:hidden border-t border-themed">
+        <div class="container-custom py-4 space-y-4">
+          <a href="/#features" class="block text-foreground-muted hover:text-primary transition-colors py-2">Features</a>
+          <a href="/#use-cases" class="block text-foreground-muted hover:text-primary transition-colors py-2">Use Cases</a>
+          <a href="/pricing" class="block text-foreground-muted hover:text-primary transition-colors py-2">Services</a>
+          <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="block text-foreground-muted hover:text-primary transition-colors py-2">GitHub</a>
+          <a href="https://docs.barbacane.dev" class="block text-foreground-muted hover:text-primary transition-colors py-2">Documentation</a>
+          <a href="/#get-started" class="block text-foreground-muted hover:text-primary transition-colors py-2">Get Started</a>
+          <button class="theme-toggle w-full flex items-center justify-between py-2 text-foreground-muted hover:text-primary transition-colors">
+            <span>Theme</span>
+            <svg class="theme-sun-icon w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+            <svg class="theme-moon-icon w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
     </nav>
+
+    <script>
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const burgerIcon = mobileMenuBtn?.querySelector('.burger-icon');
+      const closeIcon = mobileMenuBtn?.querySelector('.close-icon');
+
+      mobileMenuBtn?.addEventListener('click', () => {
+        const isOpen = mobileMenu?.classList.toggle('hidden');
+        burgerIcon?.classList.toggle('hidden');
+        closeIcon?.classList.toggle('hidden');
+        mobileMenuBtn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+      });
+
+      // Close menu when clicking a link
+      mobileMenu?.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+          burgerIcon?.classList.remove('hidden');
+          closeIcon?.classList.add('hidden');
+          mobileMenuBtn?.setAttribute('aria-expanded', 'false');
+        });
+      });
+    </script>
 
     <main class="pt-16">
       <slot />
