@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "siteTitle": "Barbacane",
+    "defaultDescription": "Barbacane - L'API gateway spec-driven, construit en Rust. Vos specs OpenAPI et AsyncAPI deviennent la configuration de votre gateway."
+  },
+  "nav": {
+    "features": "Fonctionnalités",
+    "useCases": "Cas d'usage",
+    "services": "Services",
+    "github": "GitHub",
+    "documentation": "Documentation",
+    "getStarted": "Commencer"
+  },
+  "footer": {
+    "tagline": "L'API gateway spec-driven, construit en Rust. Vos specs OpenAPI et AsyncAPI deviennent la configuration de votre gateway.",
+    "product": "Produit",
+    "features": "Fonctionnalités",
+    "documentation": "Documentation",
+    "github": "GitHub",
+    "services": "Services",
+    "consulting": "Conseil",
+    "proSupport": "Support Pro",
+    "training": "Formation",
+    "copyright": "Barbacane. Open source sous licence Apache 2.0.",
+    "trademarkPolicy": "Politique de marques"
+  },
+  "home": {
+    "title": "Barbacane - L'API gateway spec-driven",
+    "hero": {
+      "badge": "Open Source",
+      "badgeLicense": "Apache 2.0",
+      "title": "Your spec is your",
+      "titleHighlight": "gateway",
+      "description": "Arrêtez de maintenir deux sources de vérité. Barbacane utilise vos specs OpenAPI et AsyncAPI comme source unique de vérité pour le routing, la validation, l'authentification et l'event bridging.",
+      "ctaPrimary": "Commencer",
+      "ctaSecondary": "Voir sur GitHub"
+    },
+    "problem": {
+      "title": "Le",
+      "titleHighlight": "problème",
+      "titleEnd": "des API gateways traditionnels",
+      "card1Title": "Deux sources de vérité",
+      "card1Description": "Votre spec OpenAPI définit votre API, mais votre gateway a sa propre configuration. Elles divergent inévitablement, causant bugs et failles de sécurité.",
+      "card2Title": "Temps perdu à réconcilier",
+      "card2Description": "Les équipes passent des heures à synchroniser la config du gateway avec les specs API, déboguer les différences et corriger des incohérences qui ne devraient pas exister."
+    },
+    "solution": {
+      "title": "L'approche",
+      "titleHighlight": "Barbacane",
+      "titleEnd": "",
+      "subtitle": "Une spec. Zéro dérive de configuration. Application automatique.",
+      "step1Title": "Écrivez votre spec API",
+      "step1Description": "Utilisez OpenAPI ou AsyncAPI avec les extensions",
+      "step1Code": "x-barbacane-*",
+      "step1DescriptionEnd": "pour l'auth, le rate limiting et le routing.",
+      "step2Title": "Compilez en artefact",
+      "step2Description": "Exécutez",
+      "step2Code": "barbacane compile",
+      "step2DescriptionEnd": "pour générer un artefact binaire optimisé. La validation se fait à la compilation.",
+      "step3Title": "Déployez et exécutez",
+      "step3Description": "Déployez l'artefact sur votre gateway. Routing, validation, auth — tout fonctionne exactement comme spécifié."
+    },
+    "features": {
+      "title": "Tout ce dont vous avez besoin dans une API gateway",
+      "subtitle": "Construit en Rust pour la vitesse et la sécurité. Étendu avec WebAssembly pour la flexibilité.",
+      "requestValidation": {
+        "title": "Request validation",
+        "description": "Validation automatique JSON Schema pour les bodies, paramètres et headers. Les requêtes invalides n'atteignent jamais votre backend."
+      },
+      "authentication": {
+        "title": "Authentification",
+        "description": "Authentification JWT, API Key et OAuth2 intégrée. Configurée directement dans vos security schemes OpenAPI."
+      },
+      "blazingFast": {
+        "title": "Ultra rapide",
+        "description": "Routing et validation en moins d'une microseconde. Construit sur Rust, Tokio et Hyper pour des performances maximales."
+      },
+      "wasmPlugins": {
+        "title": "Plugins WASM",
+        "description": "Étendez les fonctionnalités avec des plugins WebAssembly. L'exécution sandboxed empêche les plugins de faire crasher votre gateway."
+      },
+      "observability": {
+        "title": "Observability",
+        "description": "Métriques Prometheus, traces OpenTelemetry et logs structurés. Visibilité complète sur votre trafic API."
+      },
+      "asyncApi": {
+        "title": "AsyncAPI & Event Bridging",
+        "description": "Connectez HTTP aux systèmes event-driven. Routez les requêtes vers Kafka, NATS ou AWS Lambda via les specs AsyncAPI."
+      },
+      "controlDataPlane": {
+        "title": "Séparation Control & Data Plane",
+        "description": "Des data planes autonomes qui fonctionnent indépendamment. Déploiements zero-downtime avec updates hot-reload depuis le control plane."
+      },
+      "webUi": {
+        "title": "Interface Web",
+        "description": "Control plane visuel pour gérer projets, specs, plugins et déploiements. Fini la lutte avec le YAML."
+      },
+      "edgeReady": {
+        "title": "Edge-ready",
+        "description": "Les data planes sont des artefacts compilés légers. Déployez partout — cloud, on-prem, edge ou appareils embarqués."
+      }
+    },
+    "architecture": {
+      "title": "Architecture",
+      "titleHighlight": "enterprise-grade",
+      "subtitle": "Control plane et data plane séparés pour une résilience et flexibilité maximales.",
+      "controlPlane": {
+        "title": "Control Plane",
+        "description": "La couche de gestion pour votre flotte d'API gateways. Gère la configuration, la compilation et l'orchestration des déploiements.",
+        "feature1": "Interface web pour la gestion visuelle",
+        "feature2": "Plugin registry avec validation de schema",
+        "feature3": "Compilation de specs et création d'artefacts",
+        "feature4": "Push deployments vers les data planes"
+      },
+      "dataPlane": {
+        "title": "Data Plane(s)",
+        "description": "La couche d'exécution qui gère le trafic API réel. Totalement autonome — continue de fonctionner même si le control plane est down.",
+        "feature1": "Hot-reload sans redémarrage",
+        "feature2": "Déploiements zero-downtime",
+        "feature3": "Terminaison TLS et support mTLS",
+        "feature4": "Résilient aux pannes du control plane"
+      }
+    },
+    "useCases": {
+      "title": "Conçu pour les équipes qui prennent les APIs au sérieux",
+      "platformTeams": {
+        "title": "Équipes Plateforme",
+        "description": "Vous construisez une plateforme développeur interne ? Barbacane applique automatiquement des standards et policies API cohérents.",
+        "feature1": "Publication d'API en self-service",
+        "feature2": "Application automatique des policies",
+        "feature3": "Observability centralisée"
+      },
+      "apiProduct": {
+        "title": "Éditeurs de produits API",
+        "description": "Vous exposez des APIs publiques ? Barbacane garantit que vos contrats sont strictement appliqués et votre documentation toujours exacte.",
+        "feature1": "Développement contract-first",
+        "feature2": "Documentation toujours exacte",
+        "feature3": "Gestion des versions et du lifecycle"
+      },
+      "enterprises": {
+        "title": "Entreprises en modernisation",
+        "description": "Migration depuis des gateways legacy ? L'approche spec-first de Barbacane met de l'ordre dans les paysages API complexes.",
+        "feature1": "Chemin de migration progressif",
+        "feature2": "Logging prêt pour la compliance",
+        "feature3": "Support hybrid cloud"
+      }
+    },
+    "openSource": {
+      "badge": "100% Open Source",
+      "title": "Pas d'édition enterprise. Pas de fonctionnalités bridées.",
+      "description": "Barbacane est entièrement open source sous licence Apache 2.0. Toutes les fonctionnalités sont disponibles pour tous. Nous gagnons de l'argent via le conseil, le support et la formation — pas en prenant les fonctionnalités en otage.",
+      "cta": "Star sur GitHub"
+    },
+    "cta": {
+      "title": "Prêt à simplifier votre API gateway ?",
+      "description": "Commencez en quelques minutes. Écrivez votre spec, compilez et déployez.",
+      "codeComment1": "# Installer Barbacane",
+      "codeComment2": "# Compiler votre spec",
+      "codeComment3": "# Lancer le gateway",
+      "ctaPrimary": "Lire la documentation",
+      "ctaSecondary": "Besoin d'aide ? Parlons-en"
+    }
+  },
+  "pricing": {
+    "title": "Services & Tarifs - Barbacane",
+    "description": "Services professionnels, support et formation pour Barbacane - l'API gateway spec-driven.",
+    "hero": {
+      "title": "Services",
+      "titleHighlight": "Professionnels",
+      "description": "Barbacane est 100% open source. Nous finançons le projet grâce à des services professionnels qui vous aident à réussir."
+    },
+    "consulting": {
+      "title": "Conseil",
+      "description": "Accompagnement expert pour l'architecture, la migration et les solutions sur mesure.",
+      "feature1Title": "Revues d'architecture",
+      "feature1Description": "Analyse approfondie de votre paysage API et des besoins de gateway",
+      "feature2Title": "Planification de migration",
+      "feature2Description": "Chemin structuré des gateways legacy vers Barbacane",
+      "feature3Title": "Développement de plugins custom",
+      "feature3Description": "Plugins WASM adaptés à vos besoins spécifiques",
+      "feature4Title": "Optimisation des performances",
+      "feature4Description": "Tuning pour vos traffic patterns et SLOs",
+      "cta": "Réserver un appel"
+    },
+    "support": {
+      "badge": "Le plus populaire",
+      "title": "Support Pro",
+      "description": "Support avec SLA et accès direct aux maintainers.",
+      "feature1Title": "SLAs garantis",
+      "feature1Description": "Garanties de temps de réponse pour les problèmes critiques",
+      "feature2Title": "Résolution prioritaire",
+      "feature2Description": "Vos bugs et demandes de fonctionnalités sont traités en priorité",
+      "feature3Title": "Accès direct aux maintainers",
+      "feature3Description": "Canal Slack privé avec l'équipe core",
+      "feature4Title": "Avis de sécurité",
+      "feature4Description": "Notification anticipée des problèmes de sécurité",
+      "cta": "Réserver un appel"
+    },
+    "training": {
+      "title": "Formation",
+      "description": "Ateliers pratiques pour faire monter votre équipe en compétences.",
+      "feature1Title": "Design d'API spec-driven",
+      "feature1Description": "Bonnes pratiques OpenAPI & AsyncAPI avec les extensions Barbacane",
+      "feature2Title": "Développement de plugins WASM",
+      "feature2Description": "Créez des plugins custom en Rust, Go ou AssemblyScript",
+      "feature3Title": "Opérations & monitoring",
+      "feature3Description": "Deployment, scaling et observability en profondeur",
+      "feature4Title": "Programme personnalisé",
+      "feature4Description": "Contenu adapté aux besoins de votre équipe",
+      "cta": "Réserver un appel"
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "q1Title": "Barbacane est-il vraiment gratuit ?",
+      "q1Answer": "Oui. Barbacane est 100% open source sous licence Apache 2.0. Il n'y a pas d'\"édition enterprise\" avec des fonctionnalités bridées. Toutes les capacités sont disponibles pour tous, pour toujours. Notre modèle économique repose sur les services professionnels, pas sur les restrictions de fonctionnalités.",
+      "q2Title": "Et si je n'ai pas besoin de services payants ?",
+      "q2Answer": "Aucun problème ! Utilisez Barbacane librement, contribuez au projet si vous le pouvez, et contactez-nous quand vous avez besoin d'aide. Notre documentation, les issues GitHub et les canaux communautaires sont accessibles à tous.",
+      "q3Title": "Pouvez-vous aider avec les exigences de compliance ?",
+      "q3Answer": "Absolument. Nos offres de conseil incluent des revues de compliance pour SOC 2, RGPD, HIPAA et autres frameworks. Nous vous aidons à configurer le logging, les security policies et les audit trails de Barbacane pour répondre à vos exigences.",
+      "q4Title": "Proposez-vous le déploiement on-premise ?",
+      "q4Answer": "Barbacane est conçu pour fonctionner partout — on-prem, dans votre cloud, à l'edge. Nous pouvons vous aider à concevoir et implémenter l'architecture de deployment adaptée à votre infrastructure et vos exigences de sécurité."
+    },
+    "contact": {
+      "title": "Pas sûr de ce dont vous avez besoin ?",
+      "description": "Parlons-en. Nous vous aiderons à trouver la meilleure voie pour votre équipe.",
+      "ctaPrimary": "Réserver un appel de 15 min",
+      "or": "ou",
+      "ctaSecondary": "Copier l'email",
+      "copied": "Copié !"
+    }
+  }
+}

@@ -1,23 +1,46 @@
 ---
 import ThemeToggle from '../components/ThemeToggle.astro';
+import LanguageSelector from '../components/LanguageSelector.astro';
+import { useTranslations, LOCALES, DEFAULT_LOCALE, type Locale } from '../i18n';
 
 interface Props {
   title: string;
   description?: string;
+  locale?: Locale;
 }
 
 const {
   title,
-  description = "Barbacane - The spec-driven API gateway built in Rust. Your OpenAPI and AsyncAPI specs become your gateway configuration."
+  locale = DEFAULT_LOCALE,
+  description,
 } = Astro.props;
 
+const t = useTranslations(locale);
+const defaultDescription = t('meta.defaultDescription');
+const finalDescription = description || defaultDescription;
+
 const siteUrl = 'https://barbacane.dev';
-const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
+// Get current path without locale prefix
+const currentPath = Astro.url.pathname.replace(new RegExp(`^/${locale}`), '') || '/';
+const canonicalUrl = new URL(`/${locale}${currentPath === '/' ? '' : currentPath}`, siteUrl).href;
 const ogImage = `${siteUrl}/og-image.png`;
+
+// Generate hreflang URLs for all locales
+const hreflangUrls = LOCALES.map((loc) => ({
+  locale: loc,
+  url: new URL(`/${loc}${currentPath === '/' ? '' : currentPath}`, siteUrl).href,
+}));
+
+// Helper to generate locale-aware paths
+function localePath(path: string): string {
+  if (path.startsWith('http') || path.startsWith('#')) return path;
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `/${locale}${cleanPath === '/' ? '' : cleanPath}`;
+}
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang={locale} class="dark">
   <head>
     <script is:inline>
       // Prevent flash by setting theme immediately
@@ -31,26 +54,33 @@ const ogImage = `${siteUrl}/og-image.png`;
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
+    <meta name="description" content={finalDescription} />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="canonical" href={canonicalUrl} />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
+    <!-- Hreflang tags for SEO -->
+    {hreflangUrls.map(({ locale: loc, url }) => (
+      <link rel="alternate" hreflang={loc} href={url} />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={new URL(`/${DEFAULT_LOCALE}${currentPath === '/' ? '' : currentPath}`, siteUrl).href} />
+
     <!-- Open Graph -->
     <meta property="og:site_name" content="Barbacane" />
     <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={finalDescription} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={locale} />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:description" content={finalDescription} />
     <meta name="twitter:image" content={ogImage} />
 
     <!-- JSON-LD Structured Data -->
@@ -60,7 +90,7 @@ const ogImage = `${siteUrl}/og-image.png`;
       "name": "Barbacane",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Linux, macOS, Windows",
-      "description": description,
+      "description": finalDescription,
       "url": siteUrl,
       "offers": {
         "@type": "Offer",
@@ -78,22 +108,23 @@ const ogImage = `${siteUrl}/og-image.png`;
     <nav class="fixed top-0 left-0 right-0 z-50 nav-bg backdrop-blur-lg border-b border-themed">
       <div class="container-custom">
         <div class="flex items-center justify-between h-16">
-          <a href="/" class="flex items-center gap-3">
+          <a href={localePath('/')} class="flex items-center gap-3">
             <img src="/favicon.png" alt="Barbacane" class="h-8 w-8" />
             <span class="font-bold text-xl text-gradient">Barbacane</span>
           </a>
 
           <div class="hidden md:flex items-center gap-8">
-            <a href="/#features" class="text-foreground-muted hover:text-primary transition-colors">Features</a>
-            <a href="/#use-cases" class="text-foreground-muted hover:text-primary transition-colors">Use Cases</a>
-            <a href="/pricing" class="text-foreground-muted hover:text-primary transition-colors">Services</a>
-            <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="text-foreground-muted hover:text-primary transition-colors">GitHub</a>
+            <a href={`${localePath('/')}#features`} class="text-foreground-muted hover:text-primary transition-colors">{t('nav.features')}</a>
+            <a href={`${localePath('/')}#use-cases`} class="text-foreground-muted hover:text-primary transition-colors">{t('nav.useCases')}</a>
+            <a href={localePath('/pricing')} class="text-foreground-muted hover:text-primary transition-colors">{t('nav.services')}</a>
+            <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="text-foreground-muted hover:text-primary transition-colors">{t('nav.github')}</a>
           </div>
 
           <div class="flex items-center gap-4">
+            <LanguageSelector locale={locale} currentPath={currentPath} />
             <ThemeToggle />
-            <a href="https://docs.barbacane.dev" class="btn-secondary hidden sm:inline-flex">Documentation</a>
-            <a href="/#get-started" class="btn-primary">Get Started</a>
+            <a href="https://docs.barbacane.dev" class="btn-secondary hidden sm:inline-flex">{t('nav.documentation')}</a>
+            <a href={`${localePath('/')}#get-started`} class="btn-primary">{t('nav.getStarted')}</a>
           </div>
         </div>
       </div>
@@ -107,40 +138,40 @@ const ogImage = `${siteUrl}/og-image.png`;
       <div class="container-custom py-12">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div class="md:col-span-2">
-            <a href="/" class="flex items-center gap-3 mb-4">
+            <a href={localePath('/')} class="flex items-center gap-3 mb-4">
               <img src="/favicon.png" alt="Barbacane" class="h-8 w-8" />
               <span class="font-bold text-xl text-gradient">Barbacane</span>
             </a>
             <p class="text-foreground-muted max-w-md">
-              The spec-driven API gateway built in Rust. Your OpenAPI and AsyncAPI specs become your gateway configuration.
+              {t('footer.tagline')}
             </p>
           </div>
 
           <div>
-            <h4 class="font-semibold mb-4">Product</h4>
+            <h4 class="font-semibold mb-4">{t('footer.product')}</h4>
             <ul class="space-y-2 text-foreground-muted">
-              <li><a href="/#features" class="hover:text-primary transition-colors">Features</a></li>
-              <li><a href="https://docs.barbacane.dev" class="hover:text-primary transition-colors">Documentation</a></li>
-              <li><a href="https://github.com/barbacane-dev/barbacane" class="hover:text-primary transition-colors">GitHub</a></li>
+              <li><a href={`${localePath('/')}#features`} class="hover:text-primary transition-colors">{t('footer.features')}</a></li>
+              <li><a href="https://docs.barbacane.dev" class="hover:text-primary transition-colors">{t('footer.documentation')}</a></li>
+              <li><a href="https://github.com/barbacane-dev/barbacane" class="hover:text-primary transition-colors">{t('footer.github')}</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 class="font-semibold mb-4">Services</h4>
+            <h4 class="font-semibold mb-4">{t('footer.services')}</h4>
             <ul class="space-y-2 text-foreground-muted">
-              <li><a href="/pricing#consulting" class="hover:text-primary transition-colors">Consulting</a></li>
-              <li><a href="/pricing#support" class="hover:text-primary transition-colors">Pro Support</a></li>
-              <li><a href="/pricing#training" class="hover:text-primary transition-colors">Training</a></li>
+              <li><a href={`${localePath('/pricing')}#consulting`} class="hover:text-primary transition-colors">{t('footer.consulting')}</a></li>
+              <li><a href={`${localePath('/pricing')}#support`} class="hover:text-primary transition-colors">{t('footer.proSupport')}</a></li>
+              <li><a href={`${localePath('/pricing')}#training`} class="hover:text-primary transition-colors">{t('footer.training')}</a></li>
             </ul>
           </div>
         </div>
 
         <div class="border-t border-themed mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p class="text-foreground-muted text-sm">
-            &copy; {new Date().getFullYear()} Barbacane. Open source under Apache 2.0.
+            &copy; {new Date().getFullYear()} {t('footer.copyright')}
           </p>
           <p class="text-foreground-muted text-sm">
-            <a href="/trademarks" class="hover:text-primary transition-colors">Trademark Policy</a>
+            <a href="/trademarks" class="hover:text-primary transition-colors">{t('footer.trademarkPolicy')}</a>
           </p>
         </div>
       </div>

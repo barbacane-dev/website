@@ -1,0 +1,518 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { useTranslations, LOCALES, isValidLocale, type Locale } from '../../i18n';
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({
+    params: { locale },
+  }));
+}
+
+const { locale } = Astro.params;
+
+if (!isValidLocale(locale)) {
+  return Astro.redirect('/en/', 301);
+}
+
+const t = useTranslations(locale as Locale);
+---
+
+<Layout locale={locale as Locale} title={t('home.title')}>
+  <!-- Hero Section -->
+  <section class="section relative overflow-hidden">
+    <div class="absolute inset-0 hero-gradient"></div>
+    <div class="container-custom relative">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background-light border border-themed mb-8">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span class="text-sm text-foreground-muted">{t('home.hero.badge')} &middot; {t('home.hero.badgeLicense')}</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
+          {t('home.hero.title')}
+          <span class="text-gradient">{t('home.hero.titleHighlight')}</span>
+        </h1>
+
+        <p class="text-lg sm:text-xl text-foreground-muted max-w-2xl mx-auto mb-10">
+          {t('home.hero.description')}
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#get-started" class="btn-primary text-lg px-8 py-4">
+            {t('home.hero.ctaPrimary')}
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+            </svg>
+          </a>
+          <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="btn-secondary text-lg px-8 py-4">
+            <svg class="mr-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            {t('home.hero.ctaSecondary')}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem Section -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12">
+          {t('home.problem.title')} <span class="text-accent">{t('home.problem.titleHighlight')}</span> {t('home.problem.titleEnd')}
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="card border-error/20">
+            <div class="w-12 h-12 rounded-lg bg-error-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">{t('home.problem.card1Title')}</h3>
+            <p class="text-foreground-muted">
+              {t('home.problem.card1Description')}
+            </p>
+          </div>
+
+          <div class="card border-error/20">
+            <div class="w-12 h-12 rounded-lg bg-error-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">{t('home.problem.card2Title')}</h3>
+            <p class="text-foreground-muted">
+              {t('home.problem.card2Description')}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solution Section -->
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          {t('home.solution.title')} <span class="text-gradient">{t('home.solution.titleHighlight')}</span> {t('home.solution.titleEnd')}
+        </h2>
+        <p class="text-xl text-foreground-muted">
+          {t('home.solution.subtitle')}
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="card text-center">
+          <div class="w-16 h-16 rounded-2xl bg-primary-subtle flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl">1</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">{t('home.solution.step1Title')}</h3>
+          <p class="text-foreground-muted">
+            {t('home.solution.step1Description')} <code class="text-primary">{t('home.solution.step1Code')}</code> {t('home.solution.step1DescriptionEnd')}
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div class="w-16 h-16 rounded-2xl bg-secondary-subtle flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl">2</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">{t('home.solution.step2Title')}</h3>
+          <p class="text-foreground-muted">
+            {t('home.solution.step2Description')} <code class="text-secondary">{t('home.solution.step2Code')}</code> {t('home.solution.step2DescriptionEnd')}
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div class="w-16 h-16 rounded-2xl bg-accent-subtle flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl">3</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">{t('home.solution.step3Title')}</h3>
+          <p class="text-foreground-muted">
+            {t('home.solution.step3Description')}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          {t('home.features.title')}
+        </h2>
+        <p class="text-xl text-foreground-muted">
+          {t('home.features.subtitle')}
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">{t('home.features.requestValidation.title')}</h3>
+          <p class="text-foreground-muted">
+            {t('home.features.requestValidation.description')}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">{t('home.features.authentication.title')}</h3>
+          <p class="text-foreground-muted">
+            {t('home.features.authentication.description')}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">{t('home.features.blazingFast.title')}</h3>
+          <p class="text-foreground-muted">
+            {t('home.features.blazingFast.description')}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">{t('home.features.wasmPlugins.title')}</h3>
+          <p class="text-foreground-muted">
+            {t('home.features.wasmPlugins.description')}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">{t('home.features.observability.title')}</h3>
+          <p class="text-foreground-muted">
+            {t('home.features.observability.description')}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">{t('home.features.asyncApi.title')}</h3>
+          <p class="text-foreground-muted">
+            {t('home.features.asyncApi.description')}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">{t('home.features.controlDataPlane.title')}</h3>
+          <p class="text-foreground-muted">
+            {t('home.features.controlDataPlane.description')}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">{t('home.features.webUi.title')}</h3>
+          <p class="text-foreground-muted">
+            {t('home.features.webUi.description')}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">{t('home.features.edgeReady.title')}</h3>
+          <p class="text-foreground-muted">
+            {t('home.features.edgeReady.description')}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture Section -->
+  <section id="architecture" class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          {t('home.architecture.title')} <span class="text-gradient">{t('home.architecture.titleHighlight')}</span>
+        </h2>
+        <p class="text-xl text-foreground-muted">
+          {t('home.architecture.subtitle')}
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div class="card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-primary-subtle flex items-center justify-center">
+              <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold">{t('home.architecture.controlPlane.title')}</h3>
+          </div>
+          <p class="text-foreground-muted mb-4">
+            {t('home.architecture.controlPlane.description')}
+          </p>
+          <ul class="space-y-2 text-foreground-muted text-sm">
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.architecture.controlPlane.feature1')}</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.architecture.controlPlane.feature2')}</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.architecture.controlPlane.feature3')}</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.architecture.controlPlane.feature4')}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-secondary-subtle flex items-center justify-center">
+              <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold">{t('home.architecture.dataPlane.title')}</h3>
+          </div>
+          <p class="text-foreground-muted mb-4">
+            {t('home.architecture.dataPlane.description')}
+          </p>
+          <ul class="space-y-2 text-foreground-muted text-sm">
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.architecture.dataPlane.feature1')}</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.architecture.dataPlane.feature2')}</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.architecture.dataPlane.feature3')}</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.architecture.dataPlane.feature4')}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use Cases Section -->
+  <section id="use-cases" class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          {t('home.useCases.title')}
+        </h2>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div class="card">
+          <h3 class="text-2xl font-bold mb-4 text-primary">{t('home.useCases.platformTeams.title')}</h3>
+          <p class="text-foreground-muted mb-6">
+            {t('home.useCases.platformTeams.description')}
+          </p>
+          <ul class="space-y-3 text-foreground-muted">
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.useCases.platformTeams.feature1')}</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.useCases.platformTeams.feature2')}</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.useCases.platformTeams.feature3')}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3 class="text-2xl font-bold mb-4 text-secondary">{t('home.useCases.apiProduct.title')}</h3>
+          <p class="text-foreground-muted mb-6">
+            {t('home.useCases.apiProduct.description')}
+          </p>
+          <ul class="space-y-3 text-foreground-muted">
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.useCases.apiProduct.feature1')}</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.useCases.apiProduct.feature2')}</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.useCases.apiProduct.feature3')}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3 class="text-2xl font-bold mb-4 text-accent">{t('home.useCases.enterprises.title')}</h3>
+          <p class="text-foreground-muted mb-6">
+            {t('home.useCases.enterprises.description')}
+          </p>
+          <ul class="space-y-3 text-foreground-muted">
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.useCases.enterprises.feature1')}</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.useCases.enterprises.feature2')}</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{t('home.useCases.enterprises.feature3')}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Open Source Section -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success-subtle border border-success/20 mb-8">
+          <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span class="text-sm text-success">{t('home.openSource.badge')}</span>
+        </div>
+
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          {t('home.openSource.title')}
+        </h2>
+        <p class="text-xl text-foreground-muted max-w-2xl mx-auto mb-8">
+          {t('home.openSource.description')}
+        </p>
+
+        <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="btn-secondary">
+          <svg class="mr-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          {t('home.openSource.cta')}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section id="get-started" class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <div class="card cta-gradient text-center p-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            {t('home.cta.title')}
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-2xl mx-auto mb-8">
+            {t('home.cta.description')}
+          </p>
+
+          <div class="code-block rounded-lg p-4 mb-8 max-w-xl mx-auto">
+            <code class="text-sm sm:text-base font-mono">
+              <span class="text-foreground-muted">{t('home.cta.codeComment1')}</span><br>
+              <span class="text-primary">cargo</span> install barbacane<br><br>
+              <span class="text-foreground-muted">{t('home.cta.codeComment2')}</span><br>
+              <span class="text-primary">barbacane</span> compile api.yaml -o api.bca<br><br>
+              <span class="text-foreground-muted">{t('home.cta.codeComment3')}</span><br>
+              <span class="text-primary">barbacane</span> run api.bca
+            </code>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="https://docs.barbacane.dev/guide/getting-started.html" class="btn-primary text-lg px-8 py-4">
+              {t('home.cta.ctaPrimary')}
+            </a>
+            <a href={`/${locale}/pricing`} class="btn-secondary text-lg px-8 py-4">
+              {t('home.cta.ctaSecondary')}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

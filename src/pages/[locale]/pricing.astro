@@ -1,0 +1,308 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { useTranslations, LOCALES, isValidLocale, type Locale } from '../../i18n';
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({
+    params: { locale },
+  }));
+}
+
+const { locale } = Astro.params;
+
+if (!isValidLocale(locale)) {
+  return Astro.redirect('/en/pricing', 301);
+}
+
+const t = useTranslations(locale as Locale);
+---
+
+<Layout locale={locale as Locale} title={t('pricing.title')} description={t('pricing.description')}>
+  <!-- Hero -->
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-4xl sm:text-5xl font-extrabold mb-6">
+          {t('pricing.hero.title')} <span class="text-gradient">{t('pricing.hero.titleHighlight')}</span>
+        </h1>
+        <p class="text-xl text-foreground-muted max-w-2xl mx-auto">
+          {t('pricing.hero.description')}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Grid -->
+  <section class="section pt-0">
+    <div class="container-custom">
+      <div class="grid lg:grid-cols-3 gap-8">
+        <!-- Consulting -->
+        <div id="consulting" class="card flex flex-col h-full border-primary/20">
+          <div class="flex-1">
+            <div class="w-14 h-14 rounded-2xl bg-primary-subtle flex items-center justify-center mb-6">
+              <svg class="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold mb-4 text-primary">{t('pricing.consulting.title')}</h2>
+            <p class="text-foreground-muted mb-6">
+              {t('pricing.consulting.description')}
+            </p>
+            <ul class="space-y-4 mb-8">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <strong class="text-foreground">{t('pricing.consulting.feature1Title')}</strong>
+                  <p class="text-sm text-foreground-muted">{t('pricing.consulting.feature1Description')}</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <strong class="text-foreground">{t('pricing.consulting.feature2Title')}</strong>
+                  <p class="text-sm text-foreground-muted">{t('pricing.consulting.feature2Description')}</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <strong class="text-foreground">{t('pricing.consulting.feature3Title')}</strong>
+                  <p class="text-sm text-foreground-muted">{t('pricing.consulting.feature3Description')}</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <strong class="text-foreground">{t('pricing.consulting.feature4Title')}</strong>
+                  <p class="text-sm text-foreground-muted">{t('pricing.consulting.feature4Description')}</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <a href="https://cal.com/nicolas-dreno-xijjpz/15min" target="_blank" rel="noopener" class="btn-primary w-full justify-center">
+            {t('pricing.consulting.cta')}
+          </a>
+        </div>
+
+        <!-- Pro Support -->
+        <div id="support" class="card flex flex-col h-full border-secondary/20 relative">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+            <span class="text-sm font-semibold px-4 py-1 rounded-full" style="background-color: var(--color-secondary); color: var(--color-btn-text);">{t('pricing.support.badge')}</span>
+          </div>
+          <div class="flex-1">
+            <div class="w-14 h-14 rounded-2xl bg-secondary-subtle flex items-center justify-center mb-6">
+              <svg class="w-7 h-7 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold mb-4 text-secondary">{t('pricing.support.title')}</h2>
+            <p class="text-foreground-muted mb-6">
+              {t('pricing.support.description')}
+            </p>
+            <ul class="space-y-4 mb-8">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <strong class="text-foreground">{t('pricing.support.feature1Title')}</strong>
+                  <p class="text-sm text-foreground-muted">{t('pricing.support.feature1Description')}</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <strong class="text-foreground">{t('pricing.support.feature2Title')}</strong>
+                  <p class="text-sm text-foreground-muted">{t('pricing.support.feature2Description')}</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <strong class="text-foreground">{t('pricing.support.feature3Title')}</strong>
+                  <p class="text-sm text-foreground-muted">{t('pricing.support.feature3Description')}</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <strong class="text-foreground">{t('pricing.support.feature4Title')}</strong>
+                  <p class="text-sm text-foreground-muted">{t('pricing.support.feature4Description')}</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <a href="https://cal.com/nicolas-dreno-xijjpz/15min" target="_blank" rel="noopener" class="btn-primary shadow-glow-secondary w-full justify-center" style="background-color: var(--color-secondary);">
+            {t('pricing.support.cta')}
+          </a>
+        </div>
+
+        <!-- Training -->
+        <div id="training" class="card flex flex-col h-full border-accent/20">
+          <div class="flex-1">
+            <div class="w-14 h-14 rounded-2xl bg-accent-subtle flex items-center justify-center mb-6">
+              <svg class="w-7 h-7 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold mb-4 text-accent">{t('pricing.training.title')}</h2>
+            <p class="text-foreground-muted mb-6">
+              {t('pricing.training.description')}
+            </p>
+            <ul class="space-y-4 mb-8">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <strong class="text-foreground">{t('pricing.training.feature1Title')}</strong>
+                  <p class="text-sm text-foreground-muted">{t('pricing.training.feature1Description')}</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <strong class="text-foreground">{t('pricing.training.feature2Title')}</strong>
+                  <p class="text-sm text-foreground-muted">{t('pricing.training.feature2Description')}</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <strong class="text-foreground">{t('pricing.training.feature3Title')}</strong>
+                  <p class="text-sm text-foreground-muted">{t('pricing.training.feature3Description')}</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <div>
+                  <strong class="text-foreground">{t('pricing.training.feature4Title')}</strong>
+                  <p class="text-sm text-foreground-muted">{t('pricing.training.feature4Description')}</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <a href="https://cal.com/nicolas-dreno-xijjpz/15min" target="_blank" rel="noopener" class="btn-primary shadow-glow-accent w-full justify-center" style="background-color: var(--color-accent);">
+            {t('pricing.training.cta')}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-12">
+          {t('pricing.faq.title')}
+        </h2>
+
+        <div class="space-y-6">
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">{t('pricing.faq.q1Title')}</h3>
+            <p class="text-foreground-muted">
+              {t('pricing.faq.q1Answer')}
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">{t('pricing.faq.q2Title')}</h3>
+            <p class="text-foreground-muted">
+              {t('pricing.faq.q2Answer')}
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">{t('pricing.faq.q3Title')}</h3>
+            <p class="text-foreground-muted">
+              {t('pricing.faq.q3Answer')}
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">{t('pricing.faq.q4Title')}</h3>
+            <p class="text-foreground-muted">
+              {t('pricing.faq.q4Answer')}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact CTA -->
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-4">{t('pricing.contact.title')}</h2>
+        <p class="text-xl text-foreground-muted mb-8">
+          {t('pricing.contact.description')}
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <a href="https://cal.com/nicolas-dreno-xijjpz/15min" target="_blank" rel="noopener" class="btn-primary text-lg px-8 py-4">
+            <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            {t('pricing.contact.ctaPrimary')}
+          </a>
+          <span class="text-foreground-muted">{t('pricing.contact.or')}</span>
+          <button data-email="contact@barbacane.dev" class="copy-email-btn btn-secondary text-lg px-8 py-4">
+            <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+            </svg>
+            <span class="btn-text">{t('pricing.contact.ctaSecondary')}</span>
+            <span class="btn-copied hidden">{t('pricing.contact.copied')}</span>
+          </button>
+        </div>
+        <p class="text-sm text-foreground-muted mt-4">contact@barbacane.dev</p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  document.querySelectorAll('.copy-email-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const email = (btn as HTMLElement).dataset.email || 'contact@barbacane.dev';
+
+      try {
+        await navigator.clipboard.writeText(email);
+        const textSpan = btn.querySelector('.btn-text');
+        const copiedSpan = btn.querySelector('.btn-copied');
+
+        if (textSpan && copiedSpan) {
+          textSpan.classList.add('hidden');
+          copiedSpan.classList.remove('hidden');
+
+          setTimeout(() => {
+            textSpan.classList.remove('hidden');
+            copiedSpan.classList.add('hidden');
+          }, 2000);
+        }
+      } catch (err) {
+        window.location.href = `mailto:${email}`;
+      }
+    });
+  });
+</script>

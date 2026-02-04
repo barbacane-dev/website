@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "siteTitle": "Barbacane",
+    "defaultDescription": "Barbacane - The spec-driven API gateway built in Rust. Your OpenAPI and AsyncAPI specs become your gateway configuration."
+  },
+  "nav": {
+    "features": "Features",
+    "useCases": "Use Cases",
+    "services": "Services",
+    "github": "GitHub",
+    "documentation": "Documentation",
+    "getStarted": "Get Started"
+  },
+  "footer": {
+    "tagline": "The spec-driven API gateway built in Rust. Your OpenAPI and AsyncAPI specs become your gateway configuration.",
+    "product": "Product",
+    "features": "Features",
+    "documentation": "Documentation",
+    "github": "GitHub",
+    "services": "Services",
+    "consulting": "Consulting",
+    "proSupport": "Pro Support",
+    "training": "Training",
+    "copyright": "Barbacane. Open source under Apache 2.0.",
+    "trademarkPolicy": "Trademark Policy"
+  },
+  "home": {
+    "title": "Barbacane - The Spec-Driven API Gateway",
+    "hero": {
+      "badge": "Open Source",
+      "badgeLicense": "Apache 2.0",
+      "title": "Your spec is your",
+      "titleHighlight": "gateway",
+      "description": "Stop maintaining two sources of truth. Barbacane uses your OpenAPI and AsyncAPI specifications as the single source of truth for routing, validation, authentication, and event bridging.",
+      "ctaPrimary": "Get Started",
+      "ctaSecondary": "View on GitHub"
+    },
+    "problem": {
+      "title": "The",
+      "titleHighlight": "problem",
+      "titleEnd": "with traditional API gateways",
+      "card1Title": "Two sources of truth",
+      "card1Description": "Your OpenAPI spec defines your API, but your gateway has its own configuration. They inevitably diverge, causing bugs and security issues.",
+      "card2Title": "Wasted time reconciling",
+      "card2Description": "Teams spend hours syncing gateway config with API specs, debugging mismatches, and fixing inconsistencies that shouldn't exist."
+    },
+    "solution": {
+      "title": "The",
+      "titleHighlight": "Barbacane",
+      "titleEnd": "approach",
+      "subtitle": "One spec. Zero configuration drift. Automatic enforcement.",
+      "step1Title": "Write your API spec",
+      "step1Description": "Use OpenAPI or AsyncAPI with",
+      "step1Code": "x-barbacane-*",
+      "step1DescriptionEnd": "extensions for auth, rate limiting, and routing.",
+      "step2Title": "Compile to an artifact",
+      "step2Description": "Run",
+      "step2Code": "barbacane compile",
+      "step2DescriptionEnd": "to generate an optimized binary artifact. Validation happens at compile time.",
+      "step3Title": "Deploy and run",
+      "step3Description": "Deploy the artifact to your gateway. Routing, validation, auth — everything works exactly as specified."
+    },
+    "features": {
+      "title": "Everything you need in an API gateway",
+      "subtitle": "Built in Rust for speed and safety. Extended with WebAssembly for flexibility.",
+      "requestValidation": {
+        "title": "Request Validation",
+        "description": "Automatic JSON Schema validation for bodies, parameters, and headers. Invalid requests never reach your backend."
+      },
+      "authentication": {
+        "title": "Authentication",
+        "description": "Built-in JWT, API Key, and OAuth2 authentication. Configured directly in your OpenAPI security schemes."
+      },
+      "blazingFast": {
+        "title": "Blazing Fast",
+        "description": "Sub-microsecond routing and validation. Built on Rust, Tokio, and Hyper for maximum performance."
+      },
+      "wasmPlugins": {
+        "title": "WASM Plugins",
+        "description": "Extend functionality with WebAssembly plugins. Sandboxed execution means plugins can't crash your gateway."
+      },
+      "observability": {
+        "title": "Observability",
+        "description": "Prometheus metrics, OpenTelemetry traces, and structured logging. Full visibility into your API traffic."
+      },
+      "asyncApi": {
+        "title": "AsyncAPI & Event Bridging",
+        "description": "Bridge HTTP to event-driven systems. Route requests to Kafka, NATS, or AWS Lambda using AsyncAPI specs."
+      },
+      "controlDataPlane": {
+        "title": "Control & Data Plane Split",
+        "description": "Autonomous data planes that run independently. Zero-downtime deployments with hot-reload updates pushed from the control plane."
+      },
+      "webUi": {
+        "title": "Web UI",
+        "description": "Visual control plane for managing projects, specs, plugins, and deployments. No YAML wrestling required."
+      },
+      "edgeReady": {
+        "title": "Edge Ready",
+        "description": "Data planes are lightweight compiled artifacts. Deploy anywhere — cloud, on-prem, edge locations, or embedded devices."
+      }
+    },
+    "architecture": {
+      "title": "Enterprise-grade",
+      "titleHighlight": "architecture",
+      "subtitle": "Separate control plane and data plane for maximum resilience and flexibility.",
+      "controlPlane": {
+        "title": "Control Plane",
+        "description": "The management layer for your API gateway fleet. Handles configuration, compilation, and deployment orchestration.",
+        "feature1": "Web UI for visual management",
+        "feature2": "Plugin registry with schema validation",
+        "feature3": "Spec compilation and artifact builds",
+        "feature4": "Push deployments to data planes"
+      },
+      "dataPlane": {
+        "title": "Data Plane(s)",
+        "description": "The runtime layer that handles actual API traffic. Fully autonomous — keeps running even if the control plane is down.",
+        "feature1": "Hot-reload without restarts",
+        "feature2": "Zero-downtime deployments",
+        "feature3": "TLS termination and mTLS support",
+        "feature4": "Resilient to control plane outages"
+      }
+    },
+    "useCases": {
+      "title": "Built for teams who take APIs seriously",
+      "platformTeams": {
+        "title": "Platform Teams",
+        "description": "Building an internal developer platform? Barbacane enforces consistent API standards and policies automatically.",
+        "feature1": "Self-service API publishing",
+        "feature2": "Automatic policy enforcement",
+        "feature3": "Centralized observability"
+      },
+      "apiProduct": {
+        "title": "API Product Companies",
+        "description": "Exposing public APIs? Barbacane ensures your contracts are strictly enforced and your documentation is always accurate.",
+        "feature1": "Contract-first development",
+        "feature2": "Always-accurate documentation",
+        "feature3": "Version and lifecycle management"
+      },
+      "enterprises": {
+        "title": "Enterprises Modernizing",
+        "description": "Migrating from legacy gateways? Barbacane's spec-first approach brings order to complex API landscapes.",
+        "feature1": "Gradual migration path",
+        "feature2": "Compliance-ready logging",
+        "feature3": "Hybrid cloud support"
+      }
+    },
+    "openSource": {
+      "badge": "100% Open Source",
+      "title": "No enterprise edition. No feature gating.",
+      "description": "Barbacane is fully open source under the Apache 2.0 license. Every feature is available to everyone. We make money through consulting, support, and training — not by holding features hostage.",
+      "cta": "Star on GitHub"
+    },
+    "cta": {
+      "title": "Ready to simplify your API gateway?",
+      "description": "Get started in minutes. Write your spec, compile, and deploy.",
+      "codeComment1": "# Install Barbacane",
+      "codeComment2": "# Compile your spec",
+      "codeComment3": "# Run the gateway",
+      "ctaPrimary": "Read the docs",
+      "ctaSecondary": "Need help? Talk to us"
+    }
+  },
+  "pricing": {
+    "title": "Services & Pricing - Barbacane",
+    "description": "Professional services, support, and training for Barbacane - the spec-driven API gateway.",
+    "hero": {
+      "title": "Professional",
+      "titleHighlight": "Services",
+      "description": "Barbacane is 100% open source. We sustain the project through professional services that help you succeed."
+    },
+    "consulting": {
+      "title": "Consulting",
+      "description": "Expert guidance for architecture, migration, and custom solutions.",
+      "feature1Title": "Architecture reviews",
+      "feature1Description": "Deep-dive into your API landscape and gateway requirements",
+      "feature2Title": "Migration planning",
+      "feature2Description": "Structured path from legacy gateways to Barbacane",
+      "feature3Title": "Custom plugin development",
+      "feature3Description": "WASM plugins tailored to your specific needs",
+      "feature4Title": "Performance optimization",
+      "feature4Description": "Tuning for your traffic patterns and SLOs",
+      "cta": "Book intro call"
+    },
+    "support": {
+      "badge": "Most Popular",
+      "title": "Pro Support",
+      "description": "SLA-backed support with direct access to maintainers.",
+      "feature1Title": "Guaranteed SLAs",
+      "feature1Description": "Response time guarantees for critical issues",
+      "feature2Title": "Priority issue resolution",
+      "feature2Description": "Your bugs and features get prioritized attention",
+      "feature3Title": "Direct maintainer access",
+      "feature3Description": "Private Slack channel with the core team",
+      "feature4Title": "Security advisories",
+      "feature4Description": "Early notification of security issues",
+      "cta": "Book intro call"
+    },
+    "training": {
+      "title": "Training",
+      "description": "Hands-on workshops to level up your team.",
+      "feature1Title": "Spec-driven API design",
+      "feature1Description": "OpenAPI & AsyncAPI best practices with Barbacane extensions",
+      "feature2Title": "WASM plugin development",
+      "feature2Description": "Build custom plugins in Rust, Go, or AssemblyScript",
+      "feature3Title": "Operations & monitoring",
+      "feature3Description": "Deployment, scaling, and observability deep-dive",
+      "feature4Title": "Custom curriculum",
+      "feature4Description": "Tailored content for your team's needs",
+      "cta": "Book intro call"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "q1Title": "Is Barbacane really free?",
+      "q1Answer": "Yes. Barbacane is 100% open source under the Apache 2.0 license. There's no \"enterprise edition\" with gated features. Every capability is available to everyone, forever. Our business model is based on professional services, not feature restrictions.",
+      "q2Title": "What if I don't need paid services?",
+      "q2Answer": "That's perfectly fine! Use Barbacane freely, contribute to the project if you can, and reach out when you need help. Our documentation, GitHub issues, and community channels are available to everyone.",
+      "q3Title": "Can you help with compliance requirements?",
+      "q3Answer": "Absolutely. Our consulting packages include compliance reviews for SOC 2, GDPR, HIPAA, and other frameworks. We help you configure Barbacane's logging, security policies, and audit trails to meet your requirements.",
+      "q4Title": "Do you offer on-premise deployment?",
+      "q4Answer": "Barbacane is designed to run anywhere — on-prem, in your cloud, at the edge. We can help you design and implement the deployment architecture that fits your infrastructure and security requirements."
+    },
+    "contact": {
+      "title": "Not sure what you need?",
+      "description": "Let's talk. We'll help you figure out the best path forward for your team.",
+      "ctaPrimary": "Book a 15-min call",
+      "or": "or",
+      "ctaSecondary": "Copy email",
+      "copied": "Copied!"
+    }
+  }
+}

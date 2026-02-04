@@ -1,0 +1,70 @@
+---
+import { LOCALES, LOCALE_NAMES, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  currentPath: string;
+}
+
+const { locale, currentPath } = Astro.props;
+
+function getLocalePath(targetLocale: Locale, path: string): string {
+  // Remove current locale prefix if present
+  const cleanPath = path.replace(/^\/(en|fr|de|es)/, '') || '/';
+  return `/${targetLocale}${cleanPath === '/' ? '' : cleanPath}`;
+}
+---
+
+<div class="relative" data-language-selector>
+  <button
+    type="button"
+    class="flex items-center gap-2 p-2 rounded-lg transition-colors duration-200 hover:bg-[var(--color-background-light)] text-sm font-medium"
+    aria-label="Select language"
+    data-dropdown-toggle
+  >
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+    </svg>
+    <span class="hidden sm:inline">{LOCALE_NAMES[locale]}</span>
+    <span class="sm:hidden uppercase">{locale}</span>
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </button>
+
+  <div
+    class="absolute right-0 top-full mt-2 py-2 w-40 rounded-lg shadow-lg border border-themed hidden"
+    style="background-color: var(--color-background);"
+    data-dropdown-menu
+  >
+    {LOCALES.map((loc) => (
+      <a
+        href={getLocalePath(loc, currentPath)}
+        class:list={[
+          "block px-4 py-2 text-sm transition-colors hover:bg-[var(--color-background-light)]",
+          { "text-primary font-medium": loc === locale, "text-foreground-muted": loc !== locale }
+        ]}
+      >
+        {LOCALE_NAMES[loc]}
+      </a>
+    ))}
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('[data-language-selector]').forEach((selector) => {
+    const toggle = selector.querySelector('[data-dropdown-toggle]');
+    const menu = selector.querySelector('[data-dropdown-menu]');
+
+    toggle?.addEventListener('click', () => {
+      menu?.classList.toggle('hidden');
+    });
+
+    // Close on click outside
+    document.addEventListener('click', (e) => {
+      if (!selector.contains(e.target as Node)) {
+        menu?.classList.add('hidden');
+      }
+    });
+  });
+</script>
