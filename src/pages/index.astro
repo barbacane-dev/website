@@ -502,9 +502,9 @@ import Layout from '../layouts/Layout.astro';
               <span class="text-foreground-muted"># Install Barbacane</span><br>
               <span class="text-primary">cargo</span> install barbacane<br><br>
               <span class="text-foreground-muted"># Compile your spec</span><br>
-              <span class="text-primary">barbacane</span> compile api.yaml -o api.bca<br><br>
+              <span class="text-primary">barbacane</span> compile api.yaml --manifest barbacane.yaml --output api.bca<br><br>
               <span class="text-foreground-muted"># Run the gateway</span><br>
-              <span class="text-primary">barbacane</span> run api.bca
+              <span class="text-primary">barbacane</span> serve --artifact api.bca
             </code>
           </div>
 
