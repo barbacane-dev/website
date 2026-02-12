@@ -1,0 +1,84 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+const allPosts = await getCollection('blog', ({ data }) => {
+  return import.meta.env.PROD ? !data.draft : true;
+});
+
+const posts = allPosts.sort(
+  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+);
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(date);
+}
+---
+
+<Layout
+  title="Blog - Barbacane"
+  description="Articles about API gateways, OpenAPI, AsyncAPI, Rust, WASM, and spec-driven development."
+>
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center mb-16">
+        <h1 class="text-4xl sm:text-5xl font-extrabold mb-6">
+          Blog
+        </h1>
+        <p class="text-xl text-foreground-muted">
+          Articles about API gateways, spec-driven development, and building with Rust and WASM.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {posts.map((post) => (
+          <article class="card flex flex-col">
+            <div class="flex-1">
+              <time class="text-sm text-foreground-muted" datetime={post.data.publishDate.toISOString()}>
+                {formatDate(post.data.publishDate)}
+              </time>
+              <h2 class="text-xl font-bold mt-2 mb-3">
+                <a href={`/blog/${post.id}`} class="hover:text-primary transition-colors">
+                  {post.data.title}
+                </a>
+              </h2>
+              <p class="text-foreground-muted text-sm mb-4">
+                {post.data.description}
+              </p>
+            </div>
+            <div>
+              {post.data.tags.length > 0 && (
+                <div class="flex flex-wrap gap-2 mb-4">
+                  {post.data.tags.map((tag: string) => (
+                    <span class="text-xs px-2 py-1 rounded bg-primary-subtle text-primary">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <a
+                href={`/blog/${post.id}`}
+                class="inline-flex items-center text-sm text-primary hover:underline"
+              >
+                Read more
+                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {posts.length === 0 && (
+        <div class="text-center text-foreground-muted py-12">
+          <p>No blog posts yet. Check back soon!</p>
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>

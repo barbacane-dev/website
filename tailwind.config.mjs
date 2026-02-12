@@ -1,3 +1,5 @@
+import typography from '@tailwindcss/typography';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
@@ -21,7 +23,48 @@ export default {
         'glow-secondary': '0 0 20px rgba(139, 92, 246, 0.3)',
         'glow-accent': '0 0 20px rgba(217, 70, 239, 0.3)',
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            color: 'var(--color-foreground)',
+            a: {
+              color: 'var(--color-primary)',
+              '&:hover': { color: 'var(--color-primary-hover)' },
+            },
+            strong: { color: 'var(--color-foreground)' },
+            h1: { color: 'var(--color-foreground)' },
+            h2: { color: 'var(--color-foreground)' },
+            h3: { color: 'var(--color-foreground)' },
+            h4: { color: 'var(--color-foreground)' },
+            blockquote: {
+              color: 'var(--color-foreground-muted)',
+              borderLeftColor: 'var(--color-primary)',
+            },
+            code: {
+              color: 'var(--color-primary)',
+              backgroundColor: 'var(--color-primary-bg)',
+              borderRadius: '0.25rem',
+              padding: '0.15rem 0.35rem',
+              fontWeight: '400',
+            },
+            'code::before': { content: 'none' },
+            'code::after': { content: 'none' },
+            pre: {
+              backgroundColor: 'var(--color-background-light)',
+              border: '1px solid var(--color-border)',
+              borderRadius: '0.5rem',
+            },
+            hr: { borderColor: 'var(--color-border)' },
+            'ol > li::marker': { color: 'var(--color-foreground-muted)' },
+            'ul > li::marker': { color: 'var(--color-foreground-muted)' },
+            thead: { borderBottomColor: 'var(--color-border)' },
+            'tbody tr': { borderBottomColor: 'var(--color-border)' },
+            th: { color: 'var(--color-foreground)' },
+            td: { color: 'var(--color-foreground)' },
+          },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [typography],
 };
