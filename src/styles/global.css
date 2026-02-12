@@ -280,3 +280,53 @@ strong, b {
 .dark .code-block {
   background-color: var(--color-background);
 }
+
+/* Shiki dual-theme: switch to dark colors when .dark class is active */
+.dark .astro-code,
+.dark .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+/* Blog prose tables */
+.prose table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  width: 100%;
+}
+
+.prose thead th {
+  background-color: var(--color-background-lighter);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.prose tbody td {
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.prose tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.prose tbody tr:hover {
+  background-color: var(--color-primary-bg);
+}
+
+.prose tbody tr:first-child {
+  background-color: var(--color-primary-bg);
+}
+
+.prose tbody tr:first-child td {
+  font-weight: 500;
+}

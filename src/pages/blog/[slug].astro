@@ -1,0 +1,143 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => {
+    return import.meta.env.PROD ? !data.draft : true;
+  });
+
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(date);
+}
+
+const readingTime = Math.ceil((post.body?.split(/\s+/).length ?? 0) / 200);
+const postUrl = `https://barbacane.dev/blog/${post.id}`;
+---
+
+<Layout
+  title={`${post.data.title} - Barbacane Blog`}
+  description={post.data.description}
+  type="article"
+  article={{
+    publishedTime: post.data.publishDate.toISOString(),
+    author: post.data.author,
+    tags: post.data.tags,
+  }}
+>
+  <article class="section">
+    <div class="container-custom">
+      <!-- Article Header -->
+      <header class="max-w-3xl mx-auto mb-12 text-center">
+        <div class="flex items-center justify-center gap-3 text-sm text-foreground-muted mb-6">
+          <time datetime={post.data.publishDate.toISOString()}>
+            {formatDate(post.data.publishDate)}
+          </time>
+          <span>&middot;</span>
+          <span>{readingTime} min read</span>
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
+          {post.data.title}
+        </h1>
+
+        <p class="text-lg text-foreground-muted max-w-2xl mx-auto">
+          {post.data.description}
+        </p>
+
+        <div class="flex items-center justify-center gap-2 mt-6 text-sm text-foreground-muted">
+          <span>By {post.data.author}</span>
+        </div>
+
+        {post.data.tags.length > 0 && (
+          <div class="flex flex-wrap gap-2 justify-center mt-6">
+            {post.data.tags.map((tag: string) => (
+              <span class="text-xs px-3 py-1 rounded bg-primary-subtle text-primary">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </header>
+
+      <!-- Article Content -->
+      <div class="max-w-3xl mx-auto">
+        <div class="prose prose-lg dark:prose-invert mx-auto">
+          <Content />
+        </div>
+      </div>
+
+      <!-- Share Section -->
+      <footer class="max-w-3xl mx-auto mt-16 pt-8 border-t border-themed">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <p class="text-foreground-muted text-sm">Share this article</p>
+          <div class="flex gap-3">
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.data.title)}&url=${encodeURIComponent(postUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-secondary py-2 px-4 text-sm"
+            >
+              Twitter
+            </a>
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-secondary py-2 px-4 text-sm"
+            >
+              LinkedIn
+            </a>
+            <button
+              class="copy-url-btn btn-secondary py-2 px-4 text-sm"
+              data-url={postUrl}
+            >
+              Copy URL
+            </button>
+          </div>
+        </div>
+      </footer>
+
+      <!-- Back to Blog -->
+      <div class="max-w-3xl mx-auto mt-8 text-center">
+        <a href="/blog" class="inline-flex items-center text-primary hover:underline text-sm">
+          <svg class="mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to all posts
+        </a>
+      </div>
+    </div>
+  </article>
+</Layout>
+
+<script>
+  document.querySelectorAll('.copy-url-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const url = (btn as HTMLElement).dataset.url;
+      if (!url) return;
+
+      try {
+        await navigator.clipboard.writeText(url);
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = original; }, 2000);
+      } catch {
+        // Clipboard API not available
+      }
+    });
+  });
+</script>

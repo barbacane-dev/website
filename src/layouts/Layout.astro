@@ -4,16 +4,59 @@ import ThemeToggle from '../components/ThemeToggle.astro';
 interface Props {
   title: string;
   description?: string;
+  type?: 'website' | 'article';
+  article?: {
+    publishedTime: string;
+    author: string;
+    tags: string[];
+  };
+  ogImage?: string;
 }
 
 const {
   title,
-  description = "Barbacane - The spec-driven API gateway built in Rust. Your OpenAPI and AsyncAPI specs become your gateway configuration."
+  description = "Barbacane - The spec-driven API gateway built in Rust. Your OpenAPI and AsyncAPI specs become your gateway configuration.",
+  type = 'website',
+  article,
+  ogImage: customOgImage,
 } = Astro.props;
 
 const siteUrl = 'https://barbacane.dev';
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
-const ogImage = `${siteUrl}/og-image.png`;
+const ogImage = customOgImage || `${siteUrl}/og-image.png`;
+
+const structuredData = type === 'article' && article
+  ? {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": title,
+      "description": description,
+      "datePublished": article.publishedTime,
+      "author": {
+        "@type": "Person",
+        "name": article.author,
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Barbacane",
+        "url": siteUrl,
+        "logo": { "@type": "ImageObject", "url": `${siteUrl}/logo.png` },
+      },
+      "url": canonicalUrl,
+      "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalUrl },
+      "keywords": article.tags.join(", "),
+    }
+  : {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Barbacane",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux, macOS, Windows",
+      "description": description,
+      "url": siteUrl,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Organization", "name": "Barbacane", "url": siteUrl },
+    };
 ---
 
 <!doctype html>
@@ -41,11 +84,20 @@ const ogImage = `${siteUrl}/og-image.png`;
     <meta property="og:site_name" content="Barbacane" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={type} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    {type === 'article' && article && (
+      <>
+        <meta property="article:published_time" content={article.publishedTime} />
+        <meta property="article:author" content={article.author} />
+        {article.tags.map((tag) => (
+          <meta property="article:tag" content={tag} />
+        ))}
+      </>
+    )}
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -54,25 +106,7 @@ const ogImage = `${siteUrl}/og-image.png`;
     <meta name="twitter:image" content={ogImage} />
 
     <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json" set:html={JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Barbacane",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Linux, macOS, Windows",
-      "description": description,
-      "url": siteUrl,
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "author": {
-        "@type": "Organization",
-        "name": "Barbacane",
-        "url": siteUrl
-      }
-    })} />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
   </head>
   <body>
     <nav class="fixed top-0 left-0 right-0 z-50 nav-bg backdrop-blur-lg border-b border-themed">
@@ -87,6 +121,7 @@ const ogImage = `${siteUrl}/og-image.png`;
           <div class="hidden md:flex items-center gap-8">
             <a href="/#features" class="text-foreground-muted hover:text-primary transition-colors">Features</a>
             <a href="/#use-cases" class="text-foreground-muted hover:text-primary transition-colors">Use Cases</a>
+            <a href="/blog" class="text-foreground-muted hover:text-primary transition-colors">Blog</a>
             <a href="/pricing" class="text-foreground-muted hover:text-primary transition-colors">Services</a>
             <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="text-foreground-muted hover:text-primary transition-colors">GitHub</a>
           </div>
@@ -122,6 +157,7 @@ const ogImage = `${siteUrl}/og-image.png`;
         <div class="container-custom py-4 space-y-4">
           <a href="/#features" class="block text-foreground-muted hover:text-primary transition-colors py-2">Features</a>
           <a href="/#use-cases" class="block text-foreground-muted hover:text-primary transition-colors py-2">Use Cases</a>
+          <a href="/blog" class="block text-foreground-muted hover:text-primary transition-colors py-2">Blog</a>
           <a href="/pricing" class="block text-foreground-muted hover:text-primary transition-colors py-2">Services</a>
           <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="block text-foreground-muted hover:text-primary transition-colors py-2">GitHub</a>
           <a href="https://docs.barbacane.dev" class="block text-foreground-muted hover:text-primary transition-colors py-2">Documentation</a>
@@ -184,6 +220,7 @@ const ogImage = `${siteUrl}/og-image.png`;
             <h4 class="font-semibold mb-4">Product</h4>
             <ul class="space-y-2 text-foreground-muted">
               <li><a href="/#features" class="hover:text-primary transition-colors">Features</a></li>
+              <li><a href="/blog" class="hover:text-primary transition-colors">Blog</a></li>
               <li><a href="https://docs.barbacane.dev" class="hover:text-primary transition-colors">Documentation</a></li>
               <li><a href="https://github.com/barbacane-dev/barbacane" class="hover:text-primary transition-colors">GitHub</a></li>
             </ul>
