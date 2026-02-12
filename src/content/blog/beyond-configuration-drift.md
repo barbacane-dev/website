@@ -86,17 +86,17 @@ Critically: **no runtime spec parsing**. The gateway starts in <100ms because ev
 
 ---
 
-### Architecture Deep Dive: Control Plane vs. Data Plane
+### Architecture Deep Dive: Control Plane vs. Service Plane
 
 Barbacane cleanly separates concerns:
 
 #### The Control Plane (`barbacane-control`)
 - Stateful service (PostgreSQL-backed)
 - Handles spec ingestion, validation, and compilation
-- Serves artifacts to data planes
+- Serves artifacts to service planes
 - Provides UI for fleet visibility
 
-#### The Data Plane (`barbacane`)
+#### The Service Plane (`barbacane`)
 - **Completely stateless** single binary
 - Loads `.bca` artifact at startup (memory-mapped via FlatBuffers)
 - Zero runtime dependencies
@@ -157,7 +157,7 @@ x-barbacane-dispatcher:
       Authorization: "Bearer {{ vault://prod/api-gateway/backend-token }}"
 ```
 
-At startup, the data plane fetches secrets from HashiCorp Vault or AWS Secrets Manager, never storing them on disk. Rotate keys in Vault, and the gateway picks up new values on next restart (or via periodic refresh).
+At startup, the service plane fetches secrets from a secret manager, never storing them on disk. Rotate keys in your secret manager, and the gateway picks up new values on next restart (or via periodic refresh).
 
 ---
 
@@ -201,7 +201,7 @@ Barbacane prioritizes configuration integrity and safety over plugin breadth and
 
 | Gateway | Spec-Driven | Memory Safe | WASM Plugins | Edge-Ready | AsyncAPI |
 |---------|-------------|-------------|--------------|------------|----------|
-| **Barbacane** | Native | Rust | First-class | Stateless | Yes |
+| **Barbacane** | Native | Rust | First-class | Yes | Yes |
 | Kong | Separate config | Lua/Nginx | Experimental | Heavy | No |
 | Tyk | Separate config | Go (GC) | No | Heavy | No |
 | AWS API Gateway | Import only | N/A | No | Managed | No |
