@@ -86,17 +86,17 @@ Critically: **no runtime spec parsing**. The gateway starts in <100ms because ev
 
 ---
 
-### Architecture Deep Dive: Control Plane vs. Service Plane
+### Architecture Deep Dive: Control Plane vs. Data Plane
 
 Barbacane cleanly separates concerns:
 
 #### The Control Plane (`barbacane-control`)
 - Stateful service (PostgreSQL-backed)
 - Handles spec ingestion, validation, and compilation
-- Serves artifacts to service planes
+- Serves artifacts to data planes
 - Provides UI for fleet visibility
 
-#### The Service Plane (`barbacane`)
+#### The Data Plane (`barbacane`)
 - **Completely stateless** single binary
 - Loads `.bca` artifact at startup (memory-mapped via FlatBuffers)
 - Zero runtime dependencies
@@ -157,7 +157,7 @@ x-barbacane-dispatcher:
       Authorization: "Bearer {{ vault://prod/api-gateway/backend-token }}"
 ```
 
-At startup, the service plane fetches secrets from a secret manager, never storing them on disk. Rotate keys in your secret manager, and the gateway picks up new values on next restart (or via periodic refresh).
+At startup, the data plane fetches secrets from a secret manager, never storing them on disk. Rotate keys in your secret manager, and the gateway picks up new values on next restart (or via periodic refresh).
 
 ---
 
