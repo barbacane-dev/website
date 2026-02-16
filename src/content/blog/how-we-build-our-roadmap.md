@@ -129,7 +129,7 @@ Being open source makes this legible. Our [ROADMAP.md](https://github.com/barbac
 
 The gateways that started with a clear philosophy and then abandoned it under commercial pressure aren't better for it. They're harder to deploy, harder to reason about, and harder to contribute to. We'd rather be the right tool for teams who think spec-first than a mediocre tool for everyone.
 
-If you have ideas, constraints, or feedback that should inform our next decisions, [open a discussion on GitHub](https://github.com/barbacane-dev/barbacane/discussions). We read everything.
+If you have ideas, constraints, or feedback that should inform our next decisions, reach out at [contact@barbacane.dev](mailto:contact@barbacane.dev). We read everything.
 
 ---
 
