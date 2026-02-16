@@ -97,7 +97,7 @@ Our roadmap inputs come from four sources, in rough order of signal strength:
 
 A roadmap is defined as much by what's absent as by what's present. Here are recurring requests we've deliberately declined, not because we haven't thought about them, but because we've seen where they lead.
 
-**"Add a GUI for configuration."** I've seen this pattern too many times: a gateway ships a web console, teams start clicking instead of writing specs, and within months the GUI becomes the real configuration while the specs rot in a repo nobody reads. If you want a visual editor, use an OpenAPI editor. The spec *is* the configuration.
+**"Add a GUI for configuration."** I've seen this pattern too many times: a gateway ships a web console, teams start clicking instead of writing specs, and within months the GUI becomes the real configuration while the specs rot in a repository nobody reads. If you want a visual editor, use an OpenAPI editor. The spec *is* the configuration.
 
 **"Support non-spec-driven routes."** Every gateway that allows imperative route definitions alongside spec-driven ones eventually becomes spec-optional. One "quick" imperative route becomes ten, and then the spec is a partial lie. Every route in Barbacane traces back to a specification. Relaxing that constraint would undermine compile-time validation, embedded documentation, and conflict detection. The entire model depends on it.
 
