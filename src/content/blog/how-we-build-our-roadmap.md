@@ -40,7 +40,7 @@ Same story with AsyncAPI support. Teams were already using event-driven architec
 
 ---
 
-### Three Filters
+### Three filters
 
 Every candidate for the roadmap passes through three filters. If it doesn't clear all three, it doesn't ship.
 
