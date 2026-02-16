@@ -56,7 +56,7 @@ We resist this path. Our [out-of-scope list](https://github.com/barbacane-dev/ba
 
 Barbacane's architecture is a middleware pipeline. Every feature (authentication, authorization, rate limiting, request validation) is a middleware that plugs into the chain. A new feature must compose cleanly with everything that already exists.
 
-When we designed the [CEL and OPA authorization plugins](/blog/authorization-at-the-gateway/), this filter was critical. Both had to work downstream of *any* authentication middleware. Both had to produce consistent error responses (RFC 9457 Problem Details). Both had to be declarable per-route in the OpenAPI spec using `x-barbacane-middlewares`. When we added OIDC authentication, it had to set the same `x-auth-consumer`, `x-auth-consumer-groups`, and `x-auth-claims` headers as every other auth plugin. No exceptions.
+When we designed the [CEL and OPA authorization plugins](/blog/authorization-at-the-gateway/), this filter was critical. Both had to work downstream of *any* authentication middleware. Both had to produce consistent error responses ([RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9457)). Both had to be declarable per-route in the OpenAPI spec using `x-barbacane-middlewares`. When we added OIDC authentication, it had to set the same `x-auth-consumer`, `x-auth-consumer-groups`, and `x-auth-claims` headers as every other auth plugin. No exceptions.
 
 If a feature requires special-casing elsewhere in the pipeline, that's a design smell. We go back and rethink it.
 
