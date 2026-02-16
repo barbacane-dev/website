@@ -16,7 +16,7 @@ At Barbacane, we've built the roadmap around this conviction. It's a set of hard
 
 ---
 
-### One Principle Drives Everything
+### One principle drives everything
 
 Before talking about *how* we prioritize, it's worth restating *what* Barbacane is: **your spec is your gateway.**
 
