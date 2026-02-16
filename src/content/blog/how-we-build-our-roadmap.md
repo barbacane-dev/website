@@ -122,7 +122,7 @@ Further out, bot detection, URL redirection, and LDAP authentication are on the 
 
 ---
 
-### The Roadmap Is a Byproduct
+### The roadmap is a byproduct
 
 The best way to think about our roadmap is as a byproduct of a clear set of principles, not as a plan that exists independently. If you understand that Barbacane makes the spec the gateway, that every feature must compose with the middleware pipeline, and that we ship incrementally with honest documentation of limitations, you can predict most of what we'll build next.
 
