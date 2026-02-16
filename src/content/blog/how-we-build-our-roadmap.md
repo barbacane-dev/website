@@ -28,7 +28,7 @@ This principle is not a tagline. It's a filter. Every feature we consider gets m
 
 ---
 
-### Start with the Constraint, Not the Feature
+### Start with the constraint, not the feature
 
 Most roadmap discussions start with "what should we build?" We start with a different question: **"what constraint are we solving?"**
 
