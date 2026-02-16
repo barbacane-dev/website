@@ -93,7 +93,7 @@ Our roadmap inputs come from four sources, in rough order of signal strength:
 
 ---
 
-### What We Say No To
+### What we say no to
 
 A roadmap is defined as much by what's absent as by what's present. Here are recurring requests we've deliberately declined, not because we haven't thought about them, but because we've seen where they lead.
 
