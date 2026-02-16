@@ -107,7 +107,7 @@ A roadmap is defined as much by what's absent as by what's present. Here are rec
 
 ---
 
-### What's Next
+### What's next
 
 Right now, we're building request and response transformation middleware: the ability to modify headers, query parameters, and message bodies as they flow through the pipeline.
 
