@@ -1,5 +1,5 @@
 ---
-title: "How We Build Our Roadmap at Barbacane"
+title: "How we build our roadmap at Barbacane"
 description: "A roadmap isn't a feature wishlist. It's a series of bets about what matters most, made with incomplete information. Here's how we decide what to build next for an open-source API gateway."
 publishDate: 2026-02-16
 author: "Nicolas Dreno"
