@@ -69,7 +69,7 @@ We shipped this feature without cross-spec schema validation. We were transparen
 
 ---
 
-### How We Prioritize
+### How we prioritize
 
 We use a simple priority system (P0 through P3) for our plugin roadmap. The labels encode two things: **how many users are blocked** and **how fundamental the capability is**.
 
