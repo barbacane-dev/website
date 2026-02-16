@@ -64,7 +64,8 @@ If a feature requires special-casing elsewhere in the pipeline, that's a design 
 
 We don't build features that require six months of work before they're usable. If a feature can't ship in a state that's useful on day one and extensible later, we either scope it down or defer it.
 
-Multi-spec compilation shipped without cross-spec schema validation. We were transparent about this: route-level conflict detection is what we shipped, and we said explicitly what it doesn't do yet. Users got value immediately. We got real-world feedback. The next iteration will be better because it's informed by actual use, not speculation.
+Case in point: Multi-spec compilation.
+We shipped this feature without cross-spec schema validation. We were transparent about the trade-off: users got route-level conflict detection immediately, while we were explicit about what wasn't supported yet. This allowed us to gather real-world feedback, ensuring the next iteration (adding schema validation) will be informed by actual usage, not speculation.
 
 ---
 
