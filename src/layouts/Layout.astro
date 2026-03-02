@@ -60,17 +60,32 @@ const structuredData = type === 'article' && article
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <script is:inline>
-      // Prevent flash by setting theme immediately
-      const theme = localStorage.getItem('theme') ||
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+      // Prevent flash by setting theme immediately from device preference
+      (function() {
+        var stored = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+        var theme = stored || (prefersDark.matches ? 'dark' : 'light');
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+        // Update theme when OS preference changes (only if user hasn't set a manual preference)
+        prefersDark.addEventListener('change', function(e) {
+          if (!localStorage.getItem('theme')) {
+            document.documentElement.classList.toggle('dark', e.matches);
+            if (window.themeToggleInitialized) {
+              document.querySelectorAll('.theme-sun-icon').forEach(function(icon) {
+                icon.classList.toggle('hidden', !e.matches);
+              });
+              document.querySelectorAll('.theme-moon-icon').forEach(function(icon) {
+                icon.classList.toggle('hidden', e.matches);
+              });
+            }
+          }
+        });
+      })();
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
