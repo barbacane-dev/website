@@ -20,7 +20,7 @@ import Layout from '../layouts/Layout.astro';
 
         <p class="text-lg sm:text-xl text-foreground-muted max-w-2xl mx-auto mb-10">
           Stop maintaining two sources of truth. Barbacane uses your OpenAPI and AsyncAPI
-          specifications as the single source of truth for routing, validation, authentication, and event bridging.
+          specifications as the single source of truth for routing, validation, authentication, authorization, and event bridging.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -150,8 +150,8 @@ import Layout from '../layouts/Layout.astro';
           </div>
           <h3 class="text-xl font-semibold mb-2">Request Validation</h3>
           <p class="text-foreground-muted">
-            Automatic JSON Schema validation for bodies, parameters, and headers.
-            Invalid requests never reach your backend.
+            Automatic JSON Schema validation for bodies, parameters, and headers
+            with built-in <code class="text-primary">$ref</code> resolution. Invalid requests never reach your backend.
           </p>
         </div>
 
@@ -163,8 +163,8 @@ import Layout from '../layouts/Layout.astro';
           </div>
           <h3 class="text-xl font-semibold mb-2">Authentication</h3>
           <p class="text-foreground-muted">
-            Built-in JWT, API Key, and OAuth2 authentication. Configured directly
-            in your OpenAPI security schemes.
+            Five built-in auth plugins: JWT, OIDC, OAuth2, API Key, and Basic Auth.
+            Configured directly in your OpenAPI security schemes.
           </p>
         </div>
 
@@ -187,10 +187,10 @@ import Layout from '../layouts/Layout.astro';
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-2">WASM Plugins</h3>
+          <h3 class="text-xl font-semibold mb-2">24 WASM Plugins</h3>
           <p class="text-foreground-muted">
-            Extend functionality with WebAssembly plugins. Sandboxed execution means
-            plugins can't crash your gateway.
+            24 official plugins covering auth, security, traffic control, transformations, and observability.
+            Sandboxed WebAssembly execution means plugins can't crash your gateway.
           </p>
         </div>
 
@@ -241,8 +241,8 @@ import Layout from '../layouts/Layout.astro';
           </div>
           <h3 class="text-xl font-semibold mb-2">Web UI</h3>
           <p class="text-foreground-muted">
-            Visual control plane for managing projects, specs, plugins, and deployments.
-            No YAML wrestling required.
+            Visual control plane with syntax-highlighted spec viewer, drag-and-drop uploads,
+            build logs, data plane health monitoring, and one-click deployments.
           </p>
         </div>
 
@@ -256,6 +256,45 @@ import Layout from '../layouts/Layout.astro';
           <p class="text-foreground-muted">
             Service planes are lightweight compiled artifacts. Deploy anywhere &mdash;
             cloud, on-prem, edge locations, or embedded devices.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Authorization</h3>
+          <p class="text-foreground-muted">
+            Policy-driven access control with inline CEL expressions, Open Policy Agent integration,
+            and consumer-based ACLs. Zero-trust at the gateway.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Request Transformation</h3>
+          <p class="text-foreground-muted">
+            Declarative transformations for headers, query params, paths, and JSON bodies
+            before reaching your upstream. Variable interpolation with capture groups.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">S3 Storage Proxy</h3>
+          <p class="text-foreground-muted">
+            Proxy requests to AWS S3 or S3-compatible storage (MinIO, RustFS, Ceph) with
+            SigV4 signing. Single-bucket CDN or multi-bucket routing.
           </p>
         </div>
       </div>
@@ -499,11 +538,12 @@ import Layout from '../layouts/Layout.astro';
 
           <div class="code-block rounded-lg p-4 mb-8 max-w-xl mx-auto">
             <code class="text-sm sm:text-base font-mono">
-              <span class="text-foreground-muted"># Install Barbacane</span><br>
-              <span class="text-primary">cargo</span> install barbacane<br><br>
-              <span class="text-foreground-muted"># Compile your spec</span><br>
-              <span class="text-primary">barbacane</span> compile --spec api.yaml --manifest barbacane.yaml --output api.bca<br><br>
-              <span class="text-foreground-muted"># Run the gateway</span><br>
+              <span class="text-foreground-muted"># Try the playground with Docker</span><br>
+              <span class="text-primary">git</span> clone https://github.com/barbacane-dev/playground<br>
+              <span class="text-primary">cd</span> playground && <span class="text-primary">docker-compose</span> up -d<br><br>
+              <span class="text-foreground-muted"># Or install from source</span><br>
+              <span class="text-primary">cargo</span> install barbacane<br>
+              <span class="text-primary">barbacane</span> compile --spec api.yaml --manifest barbacane.yaml --output api.bca<br>
               <span class="text-primary">barbacane</span> serve --artifact api.bca
             </code>
           </div>
