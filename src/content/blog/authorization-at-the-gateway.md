@@ -1,5 +1,5 @@
 ---
-title: "Authorization at the Gateway: CEL and OPA for Policy-Driven Access Control"
+title: "Authorization at the gateway: CEL and OPA for policy-driven access control"
 description: "Authentication tells you who someone is. Authorization tells you what they can do. Explore how Barbacane's CEL and OPA plugins bring policy-driven access control to the gateway layer, from inline expressions to centralized policy engines."
 publishDate: 2026-02-14
 author: "Nicolas Dreno"

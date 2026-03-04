@@ -1,5 +1,5 @@
 ---
-title: "API Retirement Done Right: How Spec-Driven Gateways Turn End-of-Life Into a Non-Event"
+title: "API retirement done right: how spec-driven gateways turn end-of-life into a non-event"
 description: "APIs are easy to launch and nearly impossible to kill. Explore how Barbacane's compiled, spec-driven approach turns API retirement from an organizational ordeal into a routine lifecycle operation."
 publishDate: 2026-03-03
 author: "Nicolas Dreno"

@@ -1,5 +1,5 @@
 ---
-title: "Beyond Configuration Drift: How Barbacane Reimagines the API Gateway with Rust and WASM"
+title: "Beyond configuration drift: how Barbacane reimagines the API gateway with Rust and WASM"
 description: "What if your OpenAPI spec wasn't just documentation, but the actual configuration of your production gateway? Explore how Barbacane eliminates configuration drift with a spec-driven, compiled approach."
 publishDate: 2026-02-12
 author: "Nicolas Dreno"

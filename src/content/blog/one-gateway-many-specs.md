@@ -1,5 +1,5 @@
 ---
-title: "One Gateway, Many Specs: How Barbacane Unifies Your API Ecosystem"
+title: "One gateway, many specs: how Barbacane unifies your API ecosystem"
 description: "Most API tooling assumes one repo, one spec. But microservices don't work that way. Explore how Barbacane's multi-spec compilation merges your OpenAPI and AsyncAPI files into a single, validated artifact."
 publishDate: 2026-02-13
 author: "Nicolas Dreno"
