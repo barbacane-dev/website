@@ -2,7 +2,7 @@
 title: "Compliance by design, part 2: the compliance controls"
 description: "From schema validation and secrets management to FIPS 140-3 cryptography and GitOps workflows — the specific controls Barbacane provides for SOC 2, PCI DSS, HIPAA, FedRAMP, and beyond."
 publishDate: 2026-03-05
-author: "Baptiste Bettelu"
+author: "Baptiste Betelu"
 tags: ["barbacane", "api-gateway", "compliance", "security", "audit", "fips", "soc2", "pci-dss", "policy-as-code"]
 ---
 
