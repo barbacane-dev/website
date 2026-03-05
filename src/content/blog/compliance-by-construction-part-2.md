@@ -6,7 +6,7 @@ author: "Baptiste Betelu"
 tags: ["barbacane", "api-gateway", "compliance", "security", "audit", "fips", "soc2", "pci-dss", "policy-as-code"]
 ---
 
-*In [Part 1](/blog/compliance-by-construction-part-1/), we covered how Barbacane's compilation model turns your API spec into a verifiable compliance artifact — with artifact provenance, drift detection, inline access controls, and OPA decision logs. This post covers the remaining controls: schema validation, secrets, cryptography, change management, and how they map to specific framework requirements.*
+*In [Part 1](/blog/compliance-by-construction-part-1/), we covered how Barbacane's compilation model turns your API spec into a verifiable compliance artifact - with artifact provenance, drift detection, inline access controls, and OPA decision logs. This post covers the remaining controls: schema validation, secrets, cryptography, change management, and how they map to specific framework requirements.*
 
 ---
 
