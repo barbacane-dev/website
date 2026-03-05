@@ -34,7 +34,7 @@ This is the configuration drift problem, and it turns every compliance audit int
 
 ---
 
-### Proof by Artifact
+### Proof by artifact
 
 Barbacane's compilation model flips this. When you run:
 
