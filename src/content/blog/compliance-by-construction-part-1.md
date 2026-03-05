@@ -16,7 +16,7 @@ Barbacane changes this. Not through a compliance dashboard or a report generator
 
 ---
 
-### The Evidence Problem
+### The evidence problem
 
 Compliance frameworks, whether SOC 2 Type II, PCI DSS, HIPAA, or ISO 27001, share a common requirement: you must demonstrate that your controls were actually applied, not just that you intended them to be.
 
