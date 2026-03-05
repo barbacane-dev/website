@@ -112,7 +112,7 @@ Barbacane provides enforcement and evidence at the **gateway layer**. It does no
 - **Application-level authorization.** Fine-grained checks ("can Alice edit *this specific document*?") require data context that only the backend has. The gateway handles the coarse and medium-grained decisions; fine-grained ownership checks remain in the application.
 - **Network security controls.** mTLS between services, network segmentation, firewall rules: these belong at the infrastructure layer.
 - **Data encryption at rest.** Schema validation prevents unexpected data from entering your system; it doesn't encrypt what you store.
-- **Identity provider auditing.** OPA logs record what claims were presented; your IdP logs record how those tokens were issued. Both chains of evidence are needed for a complete picture.
+- **Identity Provider auditing.** OPA logs record what claims were presented; your Identity Provider logs record how those tokens were issued. Both chains of evidence are needed for a complete picture.
 - **Backend logging.** The gateway logs the access decision; the backend logs what was done with the request. Compliance requires both.
 
 Barbacane strengthens the API gateway layer specifically: authentication, coarse-grained authorization, schema enforcement, and configuration integrity. These are meaningful controls for most compliance frameworks, and the compile-time model makes them easier to evidence than traditional gateway setups. But they're part of a broader control stack, not a replacement for it.
