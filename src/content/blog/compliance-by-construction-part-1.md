@@ -2,7 +2,7 @@
 title: "Compliance by design, part 1: how Barbacane becomes your API audit trail"
 description: "Auditors don't just ask whether you have security controls. They ask how you can prove those controls were actually enforced. Explore how Barbacane's compiled approach turns your API gateway into a verifiable compliance artifact."
 publishDate: 2026-02-18
-author: "Baptiste Bettelu"
+author: "Baptiste Betelu"
 tags: ["barbacane", "api-gateway", "compliance", "security", "audit", "soc2", "pci-dss", "policy-as-code"]
 ---
 
