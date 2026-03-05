@@ -87,7 +87,7 @@ For SOC 2 CC7.2 and ISO 27001 A.12.4, this provides evidence that your fleet is 
 
 ---
 
-### Access Controls That Live in the Spec
+### Access controls that live in the spec
 
 One of the most common compliance requirements is demonstrating that sensitive endpoints have documented, enforced access controls. The conventional approach is to maintain a spreadsheet mapping endpoints to roles, then separately verify that the gateway configuration matches. This is manual, error-prone, and stale by the time anyone looks at it.
 
