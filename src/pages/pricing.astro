@@ -2,17 +2,130 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Services & Pricing - Barbacane" description="Professional services, support, and training for Barbacane - the spec-driven API gateway.">
+<Layout title="Pricing - Barbacane" description="Licensing and professional services for Barbacane - the spec-driven API gateway.">
   <!-- Hero -->
   <section class="section">
     <div class="container-custom">
       <div class="max-w-4xl mx-auto text-center">
         <h1 class="text-4xl sm:text-5xl font-extrabold mb-6">
-          Professional <span class="text-gradient">Services</span>
+          Licensing &amp; <span class="text-gradient">Pricing</span>
         </h1>
         <p class="text-xl text-foreground-muted max-w-2xl mx-auto">
-          Barbacane is 100% open source. We sustain the project through professional
-          services that help you succeed.
+          Barbacane is open source under AGPLv3. A commercial license is free for small
+          teams and non-profits &mdash; paid for larger organisations.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Licensing Tiers -->
+  <section class="section pt-0">
+    <div class="container-custom">
+      <div class="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <!-- AGPLv3 -->
+        <div class="card flex flex-col h-full">
+          <div class="flex-1">
+            <h2 class="text-xl font-bold mb-2">Open Source</h2>
+            <p class="text-3xl font-extrabold mb-1">Free</p>
+            <p class="text-sm text-foreground-muted mb-6">AGPLv3 license</p>
+            <ul class="space-y-3 mb-8 text-sm">
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-success mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                All features, no gating
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-success mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Use freely if you comply with AGPLv3
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-success mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Copyleft: source modifications must be published
+              </li>
+            </ul>
+          </div>
+          <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="btn-secondary w-full justify-center">
+            Get started on GitHub
+          </a>
+        </div>
+
+        <!-- Commercial Free -->
+        <div class="card flex flex-col h-full border-primary/30 relative">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+            <span class="text-sm font-semibold px-4 py-1 rounded-full bg-primary text-white">Most popular</span>
+          </div>
+          <div class="flex-1">
+            <h2 class="text-xl font-bold mb-2">Commercial License</h2>
+            <p class="text-3xl font-extrabold mb-1">Free</p>
+            <p class="text-sm text-foreground-muted mb-6">For startups, non-profits &amp; academic</p>
+            <ul class="space-y-3 mb-8 text-sm">
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Startups: ARR &le; &euro;1M and &le; 10 employees
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Non-profits, academic &amp; open-source projects
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Keep your source private
+              </li>
+            </ul>
+          </div>
+          <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="btn-primary w-full justify-center">
+            Get started on GitHub
+          </a>
+        </div>
+
+        <!-- Commercial Paid -->
+        <div class="card flex flex-col h-full">
+          <div class="flex-1">
+            <h2 class="text-xl font-bold mb-2">Commercial &mdash; Paid</h2>
+            <p class="text-3xl font-extrabold mb-1">Contact us</p>
+            <p class="text-sm text-foreground-muted mb-6">For organisations that don't qualify for the free tier</p>
+            <ul class="space-y-3 mb-8 text-sm">
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                All features, no copyleft obligation
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Run as a managed / hosted service
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Enterprise agreement &amp; invoicing available
+              </li>
+            </ul>
+          </div>
+          <a href="https://cal.com/nicolas-dreno-xijjpz/15min" target="_blank" rel="noopener" class="btn-secondary w-full justify-center">
+            Book a call
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <section class="section pt-0">
+    <div class="container-custom">
+      <hr class="border-themed max-w-5xl mx-auto" />
+      <p class="text-center text-foreground-muted mt-8 text-sm max-w-2xl mx-auto">
+        All licenses include the same software — no features are held back.
+        See <a href="https://github.com/barbacane-dev/barbacane/blob/main/LICENSING.md" target="_blank" rel="noopener" class="text-primary underline">LICENSING.md</a> in the repository for the full terms.
+      </p>
+    </div>
+  </section>
+
+  <!-- Professional Services Header -->
+  <section class="section pt-0">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">
+          Professional <span class="text-gradient">Services</span>
+        </h2>
+        <p class="text-xl text-foreground-muted max-w-2xl mx-auto">
+          Need expert help? We offer consulting, support, and training regardless of which license you use.
         </p>
       </div>
     </div>
@@ -208,9 +321,11 @@ import Layout from '../layouts/Layout.astro';
           <div class="card">
             <h3 class="text-lg font-semibold mb-2">Is Barbacane really free?</h3>
             <p class="text-foreground-muted">
-              Yes. Barbacane is 100% open source under the Apache 2.0 license. There's no
-              "enterprise edition" with gated features. Every capability is available to everyone,
-              forever. Our business model is based on professional services, not feature restrictions.
+              Yes. All features are available to everyone with no gating. The source code is
+              published under AGPLv3, which is free to use as long as you comply with its
+              copyleft terms. If you can't comply with AGPLv3 (e.g. you want to run it as a
+              managed service without publishing modifications), a commercial license is free for
+              small teams (&le;&thinsp;€1&thinsp;M ARR, &le;&thinsp;10 employees) and non-profits.
             </p>
           </div>
 
