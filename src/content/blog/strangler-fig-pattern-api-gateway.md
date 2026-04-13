@@ -17,7 +17,7 @@ In this article, we'll explore how **Barbacane**, a spec-driven API gateway buil
 
 ### What is the Strangler Fig pattern?
 
-The Strangler Fig pattern helps migrate a monolithic application to a microservices architecture incrementally, with reduced transformation risk and business disruption. The pattern works in three phases:
+The Strangler Fig pattern helps modernize legacy systems incrementally, with reduced transformation risk and business disruption. Whether you're decomposing a monolith into microservices, migrating between platforms, replacing a third-party dependency, or upgrading a protocol layer, the approach is the same. The pattern works in three phases:
 
 1. **Transform**: Introduce a facade (typically an API gateway) that intercepts all incoming requests
 2. **Elongate**: Gradually route specific endpoints or features to new implementations while legacy code handles the rest
@@ -278,7 +278,7 @@ Use the built-in Grafana dashboards (available in the [Playground](https://githu
 
 ### Conclusion
 
-The Strangler Fig pattern isn't just a migration strategy - it's a mindset: **incremental change, continuous validation, and reversible decisions**. Modern API gateways like Barbacane amplify this approach by making your API spec the executable contract for routing, policy, and observability.
+The Strangler Fig pattern works because it trades big-bang risk for **incremental change, continuous validation, and reversible decisions**. Modern API gateways like Barbacane amplify this approach by making your API spec the executable contract for routing, policy, and observability.
 
 By compiling OpenAPI into portable artifacts, enforcing safety at build time, and supporting extensible middleware via WASM, Barbacane lets you strangle legacy systems with confidence - one endpoint at a time.
 
