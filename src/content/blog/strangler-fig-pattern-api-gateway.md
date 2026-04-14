@@ -4,7 +4,7 @@ description: "Instead of risky big-bang rewrites, the Strangler Fig pattern lets
 publishDate: 2026-03-16
 author: "Nicolas Dreno"
 tags: ["barbacane", "api-gateway", "strangler-fig", "migration", "microservices", "openapi", "architecture"]
-draft: true
+draft: false
 ---
 
 *The Strangler Fig pattern, popularized by Martin Fowler, offers a pragmatic approach to modernizing legacy systems: instead of risky "big bang" rewrites, you incrementally replace functionality by routing traffic through a facade that gradually shifts requests from old to new systems.*
