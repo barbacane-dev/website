@@ -43,7 +43,7 @@ function formatDate(date: Date): string {
                 {formatDate(post.data.publishDate)}
               </time>
               <h2 class="text-xl font-bold mt-2 mb-3">
-                <a href={`/blog/${post.id}`} class="hover:text-primary transition-colors">
+                <a href={`/blog/${post.id}/`} class="hover:text-primary transition-colors">
                   {post.data.title}
                 </a>
               </h2>
@@ -62,7 +62,7 @@ function formatDate(date: Date): string {
                 </div>
               )}
               <a
-                href={`/blog/${post.id}`}
+                href={`/blog/${post.id}/`}
                 class="inline-flex items-center text-sm text-primary hover:underline"
               >
                 Read more

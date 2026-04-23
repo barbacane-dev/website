@@ -1,5 +1,65 @@
 ---
+import { Code } from 'astro:components';
 import Layout from '../layouts/Layout.astro';
+
+const mcpYaml = `# Enable MCP for the whole API
+x-barbacane-mcp:
+  enabled: true
+  server_name: Orders API
+  server_version: 1.0.0
+
+paths:
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      summary: Fetch an order by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+  /admin/orders/purge:
+    delete:
+      operationId: purgeOrders
+      summary: Purge archived orders
+      # Hide this one from agents
+      x-barbacane-mcp:
+        enabled: false
+`;
+
+const aiProxyYaml = `paths:
+  /v1/chat/completions:
+    post:
+      operationId: chatCompletion
+      summary: Route LLM chat completion
+      x-barbacane-dispatch:
+        name: ai-proxy
+        config:
+          provider: openai
+          model: gpt-4o
+          api_key: "\${OPENAI_API_KEY}"
+
+          # Tried in order on 5xx / timeout
+          fallback:
+            - provider: anthropic
+              model: claude-sonnet-4-20250514
+              api_key: "\${ANTHROPIC_API_KEY}"
+            - provider: ollama
+              model: llama3
+              base_url: http://ollama:11434
+`;
+
+const codeThemes = { light: 'github-light', dark: 'github-dark' };
 ---
 
 <Layout title="Barbacane - Open-source AI gateway for LLMs and MCP">
@@ -59,40 +119,8 @@ import Layout from '../layouts/Layout.astro';
         </div>
 
         <div class="grid lg:grid-cols-2 gap-8 items-start">
-          <div class="code-block rounded-lg p-5 text-sm overflow-auto">
-            <pre class="font-mono text-foreground"><code># Enable MCP for the whole API
-x-barbacane-mcp:
-  enabled: true
-  server_name: Orders API
-  server_version: 1.0.0
-
-paths:
-  /orders/&#123;id&#125;:
-    get:
-      operationId: getOrder
-      summary: Fetch an order by id
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: &#123; type: string &#125;
-      responses:
-        '200':
-          description: Order
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-
-  /admin/orders/purge:
-    delete:
-      operationId: purgeOrders
-      summary: Purge archived orders
-      # Hide this one from agents
-      x-barbacane-mcp:
-        enabled: false</code></pre>
+          <div class="code-block-shiki rounded-lg text-sm overflow-auto">
+            <Code code={mcpYaml} lang="yaml" themes={codeThemes} />
           </div>
 
           <div class="space-y-6">
@@ -145,27 +173,8 @@ paths:
         </div>
 
         <div class="grid lg:grid-cols-2 gap-8 items-start">
-          <div class="code-block rounded-lg p-5 text-sm overflow-auto">
-            <pre class="font-mono text-foreground"><code>paths:
-  /v1/chat/completions:
-    post:
-      operationId: chatCompletion
-      summary: Route LLM chat completion
-      x-barbacane-dispatch:
-        name: ai-proxy
-        config:
-          provider: openai
-          model: gpt-4o
-          api_key: "$&#123;OPENAI_API_KEY&#125;"
-
-          # Tried in order on 5xx / timeout
-          fallback:
-            - provider: anthropic
-              model: claude-sonnet-4-20250514
-              api_key: "$&#123;ANTHROPIC_API_KEY&#125;"
-            - provider: ollama
-              model: llama3
-              base_url: http://ollama:11434</code></pre>
+          <div class="code-block-shiki rounded-lg text-sm overflow-auto">
+            <Code code={aiProxyYaml} lang="yaml" themes={codeThemes} />
           </div>
 
           <div class="space-y-6">
