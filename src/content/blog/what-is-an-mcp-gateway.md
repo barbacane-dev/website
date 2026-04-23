@@ -90,7 +90,7 @@ Three words that sound interchangeable, and are not. Getting the disambiguation 
 
 **MCP gateway.** *Inbound* AI gateway: sits between an AI agent and *your* APIs. Exposes your operations as tools, governs the calls, tracks costs, enforces policy. Different problem from an outbound AI gateway. Complementary, not substitutable.
 
-Many teams end up running all three. The outbound AI gateway stops your app from exploding your OpenAI bill. The MCP gateway stops the agents that call your APIs from exploding your production. The API gateway handles the boring HTTP that underlies both. They are not the same box, and collapsing them is usually how shadow stacks start.
+Many teams end up needing all three categories. The outbound AI gateway stops your app from exploding your OpenAI bill. The MCP gateway stops the agents that call your APIs from exploding your production. The API gateway handles the boring HTTP that underlies both. Whether you run three separate products or one composed gateway is an architecture decision. The mistake to avoid is pretending the three are the same category, which is usually how shadow stacks start.
 
 ---
 
@@ -135,4 +135,4 @@ The MCP gateway category is in the same place the API gateway category was in ar
 
 If you are on a platform team and agents are not yet in your threat model, they are about to be. If you are on an AI product team and your agents are still calling internal APIs with hand-rolled tool servers, the shadow stack is already forming. The good news is the fix is cheap compared to the sprawl it prevents.
 
-At Barbacane we are building the MCP gateway that takes this seriously: open source, Rust-native, spec-first, with the MCP layer integrated into the API gateway rather than bolted beside it. If that sounds like what you need, [the /mcp page](/mcp/) is the five-minute version. Otherwise, the ideas above hold regardless of which tool you pick. The category matters more than the product.
+At Barbacane we are building one gateway that spans all three categories: API gateway fundamentals, outbound AI gateway for your LLM calls (via the `ai-proxy` dispatcher), and MCP gateway for agents calling your APIs. Open source, Rust-native, spec-first, composed from the same dispatcher and middleware primitives so the three layers share plumbing rather than compete with it. If that sounds like what you need, [the /mcp page](/mcp/) is the five-minute version of the MCP layer specifically. Otherwise, the ideas above hold regardless of which tool you pick. The categories matter more than the product.
