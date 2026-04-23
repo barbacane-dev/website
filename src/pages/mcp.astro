@@ -1,0 +1,491 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="MCP gateway - Barbacane"
+  description="Barbacane is the open-source MCP gateway. Turn any OpenAPI spec into a Rust-native MCP tool server with authentication, rate limits, validation, and AI governance in one middleware chain."
+>
+  <!-- Hero -->
+  <section class="section relative overflow-hidden">
+    <div class="absolute inset-0 hero-gradient"></div>
+    <div class="container-custom relative">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background-light border border-themed mb-8">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span class="text-sm text-foreground-muted">MCP native &middot; Open source &middot; AGPLv3</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
+          The open-source
+          <span class="text-gradient">MCP gateway</span>
+        </h1>
+
+        <p class="text-lg sm:text-xl text-foreground-muted max-w-2xl mx-auto mb-10">
+          Make your existing APIs agent-callable in five minutes. Barbacane compiles your
+          OpenAPI spec into a Rust-native MCP tool server, with authentication, rate limits,
+          validation, and AI governance in the same middleware chain your HTTP clients
+          already use.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#quickstart" class="btn-primary text-lg px-8 py-4">
+            Try in 5 minutes
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+            </svg>
+          </a>
+          <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="btn-secondary text-lg px-8 py-4">
+            <svg class="mr-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What is an MCP gateway -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-8 text-center">What is an MCP gateway?</h2>
+        <p class="text-lg text-foreground-muted mb-5">
+          Model Context Protocol (MCP) is the open standard for exposing tools to AI agents.
+          Most teams adopting MCP quickly hit the same problem: every internal API becomes a
+          separate tool server, each with its own auth story, its own observability story,
+          its own blast-radius story. A gap between what your agent can do and what your
+          platform team can approve.
+        </p>
+        <p class="text-lg text-foreground-muted mb-5">
+          An MCP gateway fixes that. It sits in front of your existing APIs, translates
+          agent tool calls into HTTP requests, and applies the middleware chain every
+          request already uses: authentication, authorization, rate limits, validation,
+          transformations, observability. One artifact, one blast radius, one audit trail.
+        </p>
+        <p class="text-lg text-foreground-muted">
+          Barbacane is the open-source MCP gateway built for that job. Rust-native,
+          spec-first, AGPLv3.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5-minute quickstart -->
+  <section id="quickstart" class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            From OpenAPI to MCP in <span class="text-gradient">5 minutes</span>
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
+            Four steps. No rewrite, no parallel tool server, no shadow stack.
+          </p>
+        </div>
+
+        <div class="space-y-6">
+          <div class="card">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-primary-subtle flex items-center justify-center shrink-0 mt-1">
+                <span class="text-lg font-bold text-primary">1</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-xl font-semibold mb-3">Add MCP to your spec</h3>
+                <p class="text-foreground-muted mb-4">
+                  Enable at the document root. Every operation with an
+                  <code class="text-primary">operationId</code> and a
+                  <code class="text-primary">summary</code> becomes a tool. Opt out of
+                  admin or destructive operations per-path with
+                  <code class="text-primary">enabled: false</code>.
+                </p>
+                <div class="code-block rounded-lg p-4 text-sm overflow-auto">
+                  <pre class="font-mono text-foreground"><code>x-barbacane-mcp:
+  enabled: true
+  server_name: Orders API
+  server_version: 1.0.0</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-secondary-subtle flex items-center justify-center shrink-0 mt-1">
+                <span class="text-lg font-bold text-secondary">2</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-xl font-semibold mb-3">Lint the spec, shift-left</h3>
+                <p class="text-foreground-muted mb-4">
+                  Run the Barbacane <a href="https://docs.barbacane.dev/guide/vacuum.html" class="text-primary hover:underline">vacuum ruleset</a>
+                  in your editor, a pre-commit hook, or CI. It catches missing
+                  <code class="text-primary">operationId</code>s, security
+                  misconfiguration, and MCP gaps before the compiler ever sees the spec.
+                </p>
+                <div class="code-block rounded-lg p-4 text-sm overflow-auto">
+                  <pre class="font-mono text-foreground"><code>vacuum lint \
+  -f .barbacane/rulesets/functions \
+  api.yaml</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-accent-subtle flex items-center justify-center shrink-0 mt-1">
+                <span class="text-lg font-bold text-accent">3</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-xl font-semibold mb-3">Compile the artifact</h3>
+                <p class="text-foreground-muted mb-4">
+                  The compiler synthesises tool schemas from your parameters and responses
+                  and produces a single deployable binary. It also emits warnings
+                  (<code class="text-primary">E1060</code>, <code class="text-primary">E1061</code>)
+                  if an MCP-exposed operation is missing an
+                  <code class="text-primary">operationId</code> or description, as a second
+                  line of defence after the lint.
+                </p>
+                <div class="code-block rounded-lg p-4 text-sm overflow-auto">
+                  <pre class="font-mono text-foreground"><code>barbacane compile \
+  --spec api.yaml \
+  --manifest barbacane.yaml \
+  --output api.bca</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-primary-subtle flex items-center justify-center shrink-0 mt-1">
+                <span class="text-lg font-bold text-primary">4</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-xl font-semibold mb-3">Serve and connect your agent</h3>
+                <p class="text-foreground-muted mb-4">
+                  Point any MCP-compatible agent at the JSON-RPC endpoint. Tool calls pass
+                  through the same authentication, rate-limit, and validation middleware as
+                  any HTTP request.
+                </p>
+                <div class="code-block rounded-lg p-4 text-sm overflow-auto">
+                  <pre class="font-mono text-foreground"><code>barbacane serve --artifact api.bca
+
+# Agent connects to:
+# POST http://localhost:8080/__barbacane/mcp</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-10 text-center">
+          <a href="https://docs.barbacane.dev/guide/mcp.html" class="btn-secondary">
+            Read the full MCP guide
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">How it works</h2>
+          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
+            The MCP server is not a separate runtime. It is a thin translation layer in
+            front of the request pipeline your HTTP clients already trust.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+              <span class="text-lg font-bold text-primary">1</span>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Shift-left lint</h3>
+            <p class="text-foreground-muted text-sm">
+              The <a href="https://docs.barbacane.dev/guide/vacuum.html" class="text-primary hover:underline">vacuum ruleset</a>
+              runs in your editor, pre-commit hook, or CI, before
+              <code class="text-primary">barbacane compile</code> ever sees the spec.
+              Missing <code class="text-primary">operationId</code>s, missing descriptions,
+              and security misconfigurations fail the lint, not production.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
+              <span class="text-lg font-bold text-secondary">2</span>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Schema synthesis</h3>
+            <p class="text-foreground-muted text-sm">
+              Input schema is merged from path, query, and body parameters. Output schema
+              comes from your 200 response. Agents see typed tools with no extra work on
+              your side.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
+              <span class="text-lg font-bold text-accent">3</span>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">JSON-RPC 2.0 endpoint</h3>
+            <p class="text-foreground-muted text-sm">
+              Agents call <code class="text-primary">POST /__barbacane/mcp</code> with
+              standard MCP methods: <code class="text-primary">tools/list</code>,
+              <code class="text-primary">tools/call</code>, and session lifecycle.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+              <span class="text-lg font-bold text-primary">4</span>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Middleware pass-through</h3>
+            <p class="text-foreground-muted text-sm">
+              Tool calls route through the same auth, rate-limit, validation,
+              transformation, and observability chain as any HTTP request. The
+              <code class="text-primary">Authorization</code> header is forwarded; audit
+              logs capture every call.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI governance -->
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">AI governance, built in</h2>
+          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
+            Four middlewares compose like any other Barbacane plugin. Named profiles,
+            CEL expressions, fail-closed on misconfiguration.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Prompt guard</h3>
+            <p class="text-foreground-muted text-sm">
+              PII redaction, regex allow and deny lists, shape constraints on inbound
+              prompts. Shift-left validation at lint time.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Token limits</h3>
+            <p class="text-foreground-muted text-sm">
+              Token-based sliding windows per consumer, per operation, per tenant.
+              Stop runaway agents before they cost you money.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Cost tracking</h3>
+            <p class="text-foreground-muted text-sm">
+              Per-operation spend observability as Prometheus metrics. Budget alerts and
+              cost attribution across tenants and agents.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Response guard</h3>
+            <p class="text-foreground-muted text-sm">
+              Output scrubbing, schema re-validation, and policy checks before responses
+              reach the agent. Fail closed on misconfiguration.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use cases -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">Built for these teams</h2>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+          <div class="card">
+            <h3 class="text-xl font-bold mb-3 text-primary">Platform teams</h3>
+            <p class="text-foreground-muted mb-4">
+              Give every product team one-line MCP access to internal APIs, without each
+              one shipping and operating its own MCP server.
+            </p>
+            <ul class="space-y-2 text-foreground-muted text-sm">
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Central tool catalog per tenant</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Consistent auth and rate limits</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>One audit trail for tool calls</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3 class="text-xl font-bold mb-3 text-secondary">AI product builders</h3>
+            <p class="text-foreground-muted mb-4">
+              Ship agents that can safely call your production APIs. Auth enforced, rate
+              limits applied, tokens capped, cost tracked per agent and tenant.
+            </p>
+            <ul class="space-y-2 text-foreground-muted text-sm">
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Typed tool schemas from OpenAPI</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Per-operation opt-out for admin routes</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>AI governance middlewares</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3 class="text-xl font-bold mb-3 text-accent">Regulated-industry CIOs</h3>
+            <p class="text-foreground-muted mb-4">
+              MCP your security, audit, and compliance teams can approve. Single gateway,
+              clear blast radius, fail-closed defaults, FIPS 140-3 option.
+            </p>
+            <ul class="space-y-2 text-foreground-muted text-sm">
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>AGPLv3, no vendor lock-in</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Self-hostable on-prem or air-gapped</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Artifact provenance and drift detection</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-10 text-center">Frequently asked</h2>
+
+        <div class="space-y-6">
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Do I need to rewrite my APIs?</h3>
+            <p class="text-foreground-muted">
+              No. Barbacane sits in front of your existing HTTP services. Tool calls are
+              translated into the same HTTP requests your clients already make, no
+              separate tool server to build or operate.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">How is this different from an AI gateway?</h3>
+            <p class="text-foreground-muted">
+              Outbound AI gateways (Portkey, LiteLLM, Cloudflare AI Gateway) sit between
+              your agent and an LLM provider. Barbacane is an inbound AI gateway: it sits
+              between an agent and <em>your</em> APIs, exposing them as MCP tools. You can
+              run both side by side; they solve different problems.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Which MCP transport is supported?</h3>
+            <p class="text-foreground-muted">
+              JSON-RPC 2.0 over HTTP POST on
+              <code class="text-primary">/__barbacane/mcp</code>. Session termination via
+              <code class="text-primary">DELETE</code> on the same path. No SSE dependency.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Can I hide admin endpoints from agents?</h3>
+            <p class="text-foreground-muted">
+              Yes. Add <code class="text-primary">x-barbacane-mcp: &#123; enabled: false &#125;</code>
+              to any operation you want to exclude. Everything else stays a normal HTTP
+              endpoint.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Does authentication pass through?</h3>
+            <p class="text-foreground-muted">
+              Yes. The <code class="text-primary">Authorization</code> header from the MCP
+              request is forwarded into the internal dispatch, where your
+              <code class="text-primary">jwt-auth</code>, <code class="text-primary">apikey-auth</code>,
+              or OAuth2 middleware validates it like any other request.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <div class="card cta-gradient text-center p-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            Ready to make your APIs agent-callable?
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-2xl mx-auto mb-8">
+            Read the docs, star the repo, or bring Barbacane into an internal platform
+            pilot.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="https://docs.barbacane.dev/guide/mcp.html" class="btn-primary text-lg px-8 py-4">
+              Read the docs
+            </a>
+            <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="btn-secondary text-lg px-8 py-4">
+              View on GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
