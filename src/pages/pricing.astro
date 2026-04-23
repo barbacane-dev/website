@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Pricing - Barbacane" description="Licensing and professional services for Barbacane - the spec-driven API gateway.">
+<Layout title="Pricing - Barbacane" description="Licensing and professional services for Barbacane - the open-source AI gateway for LLMs and MCP, built on a Rust-native spec-first API gateway.">
   <!-- Hero -->
   <section class="section">
     <div class="container-custom">
@@ -11,8 +11,10 @@ import Layout from '../layouts/Layout.astro';
           Licensing &amp; <span class="text-gradient">Pricing</span>
         </h1>
         <p class="text-xl text-foreground-muted max-w-2xl mx-auto">
-          Barbacane is open source under AGPLv3. A commercial license is free for small
-          teams and non-profits &mdash; paid for larger organisations.
+          Whether you run Barbacane as an API gateway, an outbound LLM proxy, an inbound
+          MCP gateway, or all three, the licensing is the same. Open source under AGPLv3.
+          A commercial license is free for small teams and non-profits, paid for larger
+          organisations.
         </p>
       </div>
     </div>
@@ -154,7 +156,7 @@ import Layout from '../layouts/Layout.astro';
                 </svg>
                 <div>
                   <strong class="text-foreground">Architecture reviews</strong>
-                  <p class="text-sm text-foreground-muted">Deep-dive into your API landscape and gateway requirements</p>
+                  <p class="text-sm text-foreground-muted">Deep-dive into your API landscape, gateway requirements, and AI traffic patterns (outbound LLM, inbound MCP)</p>
                 </div>
               </li>
               <li class="flex items-start gap-3">
@@ -163,7 +165,7 @@ import Layout from '../layouts/Layout.astro';
                 </svg>
                 <div>
                   <strong class="text-foreground">Migration planning</strong>
-                  <p class="text-sm text-foreground-muted">Structured path from legacy gateways to Barbacane</p>
+                  <p class="text-sm text-foreground-muted">Structured path from legacy API gateways or standalone LLM proxies onto Barbacane</p>
                 </div>
               </li>
               <li class="flex items-start gap-3">
@@ -172,7 +174,7 @@ import Layout from '../layouts/Layout.astro';
                 </svg>
                 <div>
                   <strong class="text-foreground">Custom plugin development</strong>
-                  <p class="text-sm text-foreground-muted">WASM plugins tailored to your specific needs</p>
+                  <p class="text-sm text-foreground-muted">WASM plugins tailored to your traffic patterns, including AI governance middlewares</p>
                 </div>
               </li>
               <li class="flex items-start gap-3">
@@ -269,7 +271,7 @@ import Layout from '../layouts/Layout.astro';
                 </svg>
                 <div>
                   <strong class="text-foreground">Spec-driven API design</strong>
-                  <p class="text-sm text-foreground-muted">OpenAPI & AsyncAPI best practices with Barbacane extensions</p>
+                  <p class="text-sm text-foreground-muted">OpenAPI and AsyncAPI best practices, including MCP extensions for exposing APIs to AI agents</p>
                 </div>
               </li>
               <li class="flex items-start gap-3">
@@ -343,16 +345,27 @@ import Layout from '../layouts/Layout.astro';
             <p class="text-foreground-muted">
               Absolutely. Our consulting packages include compliance reviews for SOC 2, GDPR,
               HIPAA, and other frameworks. We help you configure Barbacane's logging, security
-              policies, and audit trails to meet your requirements.
+              policies, AI governance middlewares, and audit trails to meet your requirements.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Does this cover AI and MCP workloads?</h3>
+            <p class="text-foreground-muted">
+              Yes. Barbacane's AI gateway capabilities (<code class="text-primary">ai-proxy</code>
+              dispatcher, AI governance middlewares) and MCP gateway capabilities are part of
+              the same software. The same licensing and services apply, whether you are using
+              Barbacane for outbound LLM routing, inbound agent tool exposure, or as a full API
+              gateway.
             </p>
           </div>
 
           <div class="card">
             <h3 class="text-lg font-semibold mb-2">Do you offer on-premise deployment?</h3>
             <p class="text-foreground-muted">
-              Barbacane is designed to run anywhere &mdash; on-prem, in your cloud, at the edge.
-              We can help you design and implement the deployment architecture that fits your
-              infrastructure and security requirements.
+              Barbacane is designed to run anywhere: on-prem, in your cloud, at the edge, or
+              air-gapped. We can help you design and implement the deployment architecture that
+              fits your infrastructure and security requirements.
             </p>
           </div>
         </div>
