@@ -6,6 +6,9 @@ export default defineConfig({
   integrations: [tailwind(), sitemap()],
   site: 'https://barbacane.dev',
   trailingSlash: 'always',
+  redirects: {
+    '/mcp/': '/ai/',
+  },
   markdown: {
     shikiConfig: {
       themes: {

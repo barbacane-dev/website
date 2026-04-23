@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Barbacane - Open-source AI gateway for MCP and OpenAPI">
+<Layout title="Barbacane - Open-source AI gateway for LLMs and MCP">
   <!-- Hero Section -->
   <section class="section relative overflow-hidden">
     <div class="absolute inset-0 hero-gradient"></div>
@@ -10,24 +10,24 @@ import Layout from '../layouts/Layout.astro';
       <div class="max-w-4xl mx-auto text-center">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background-light border border-themed mb-8">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          <span class="text-sm text-foreground-muted">Open source &middot; MCP native &middot; AGPLv3</span>
+          <span class="text-sm text-foreground-muted">Open source &middot; AI gateway &middot; AGPLv3</span>
         </div>
 
         <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
-          Turn any OpenAPI spec into an
-          <span class="text-gradient">MCP tool server</span>
+          One AI gateway,
+          <span class="text-gradient">both directions</span>
         </h1>
 
-        <p class="text-lg sm:text-xl text-foreground-muted max-w-2xl mx-auto mb-10">
-          Barbacane is the open-source AI gateway for Model Context Protocol.
-          Expose your existing APIs to AI agents as typed, governed, auditable tools.
-          Prompt guarding, token limits, cost tracking, and response guarding are built in.
-          One Rust-native artifact, spec-first.
+        <p class="text-lg sm:text-xl text-foreground-muted max-w-3xl mx-auto mb-10">
+          Barbacane handles AI traffic on the way out and on the way in. Route your
+          application's LLM calls through OpenAI, Anthropic, or Ollama with provider
+          fallback and policy routing. Expose your existing APIs to AI agents as typed
+          MCP tools. Same gateway, same middleware, same spec.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="#mcp-quickstart" class="btn-primary text-lg px-8 py-4">
-            See it in action
+          <a href="/ai/" class="btn-primary text-lg px-8 py-4">
+            Explore the AI gateway
             <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
             </svg>
@@ -129,8 +129,84 @@ paths:
     </div>
   </section>
 
+  <!-- Outbound AI Proxy Section -->
+  <section id="ai-proxy-outbound" class="section">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            Your app calls LLMs through <span class="text-gradient">one dispatcher</span>
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
+            Route outbound LLM requests through OpenAI, Anthropic, or Ollama with provider
+            fallback, policy-driven targets, and the same middleware chain you use for
+            every other request.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8 items-start">
+          <div class="code-block rounded-lg p-5 text-sm overflow-auto">
+            <pre class="font-mono text-foreground"><code>paths:
+  /v1/chat/completions:
+    post:
+      operationId: chatCompletion
+      summary: Route LLM chat completion
+      x-barbacane-dispatch:
+        name: ai-proxy
+        config:
+          provider: openai
+          model: gpt-4o
+          api_key: "$&#123;OPENAI_API_KEY&#125;"
+
+          # Tried in order on 5xx / timeout
+          fallback:
+            - provider: anthropic
+              model: claude-sonnet-4-20250514
+              api_key: "$&#123;ANTHROPIC_API_KEY&#125;"
+            - provider: ollama
+              model: llama3
+              base_url: http://ollama:11434</code></pre>
+          </div>
+
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Clients send OpenAI format</h3>
+              <p class="text-foreground-muted">
+                The <code class="text-primary">ai-proxy</code> dispatcher exposes a
+                unified OpenAI-compatible API surface and translates per provider
+                internally. Pinned upstream API versions make breaking changes a
+                deliberate plugin upgrade, not a silent production incident.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Fallback on failure</h3>
+              <p class="text-foreground-muted">
+                When the primary provider returns 5xx or times out, the dispatcher tries
+                the next target in the fallback chain. 4xx errors (content policy, invalid
+                model) return directly to the client.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Policy-driven targets</h3>
+              <p class="text-foreground-muted">
+                Stack <code class="text-primary">cel</code> middleware rules to set
+                <code class="text-primary">ai.target</code> in context based on consumer
+                tier, scopes, or headers. Credentials stay in dispatcher config, never in
+                context.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-10 text-center">
+          <a href="/ai/" class="btn-secondary">Read the full AI gateway story</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- AI Governance Section -->
-  <section class="section">
+  <section class="section bg-background-light">
     <div class="container-custom">
       <div class="max-w-5xl mx-auto">
         <div class="text-center mb-12">
