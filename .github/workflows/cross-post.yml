@@ -1,0 +1,52 @@
+name: Cross-post blog articles
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/content/blog/**.md'
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: 'Slug to cross-post (e.g. what-is-an-mcp-gateway)'
+        required: true
+      dry_run:
+        description: 'Dry run (print payload, do not post)'
+        type: boolean
+        default: true
+
+jobs:
+  cross-post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Cross-post
+        env:
+          DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+          HASHNODE_TOKEN: ${{ secrets.HASHNODE_TOKEN }}
+          HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
+          BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ARGS="--slug=${{ github.event.inputs.slug }}"
+            if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+              ARGS="$ARGS --dry-run"
+            fi
+            node scripts/cross-post.mjs $ARGS
+          else
+            node scripts/cross-post.mjs
+          fi
