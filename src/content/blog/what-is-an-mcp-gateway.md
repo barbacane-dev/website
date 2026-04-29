@@ -4,7 +4,7 @@ description: "Model Context Protocol turns any API into a potential AI agent too
 publishDate: 2026-04-23
 author: "Nicolas Dreno"
 tags: ["mcp", "mcp-gateway", "ai-gateway", "api-gateway", "model-context-protocol", "ai-governance"]
-draft: true
+draft: false
 ---
 
 *If you have an API and you have agents, someone on your team is about to ask: how do we expose this to MCP?*
