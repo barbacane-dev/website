@@ -1,0 +1,605 @@
+---
+import { Code } from 'astro:components';
+import Layout from '../layouts/Layout.astro';
+
+const outboundYaml = `paths:
+  /v1/chat/completions:
+    post:
+      operationId: chatCompletion
+      summary: Route LLM chat completion requests
+      x-barbacane-dispatch:
+        name: ai-proxy
+        config:
+          provider: openai
+          model: gpt-4o
+          api_key: "\${OPENAI_API_KEY}"
+          timeout: 120
+
+          # Tried in order on 5xx / timeout
+          fallback:
+            - provider: anthropic
+              model: claude-sonnet-4-20250514
+              api_key: "\${ANTHROPIC_API_KEY}"
+            - provider: ollama
+              model: llama3
+              base_url: http://ollama:11434
+
+          # Named targets for policy-driven routing
+          targets:
+            local:
+              provider: ollama
+              model: mistral
+              base_url: http://ollama:11434
+            premium:
+              provider: anthropic
+              model: claude-opus-4-6
+              api_key: "\${ANTHROPIC_API_KEY}"
+          default_target: local
+`;
+
+const inboundYaml = `# Enable MCP for the whole API
+x-barbacane-mcp:
+  enabled: true
+  server_name: Orders API
+  server_version: 1.0.0
+
+paths:
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      summary: Fetch an order by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+  /admin/orders/purge:
+    delete:
+      operationId: purgeOrders
+      summary: Purge archived orders
+      # Hide this one from agents
+      x-barbacane-mcp:
+        enabled: false
+`;
+
+const codeThemes = { light: 'github-light', dark: 'github-dark' };
+---
+
+<Layout
+  title="AI gateway for MCP and LLMs - Barbacane"
+  description="Barbacane is the open-source AI gateway that handles both directions. Outbound: route LLM calls through OpenAI, Anthropic, or Ollama with provider fallback and policy routing. Inbound: expose your APIs to AI agents as typed MCP tools. Rust-native, spec-first, composed from dispatchers and middlewares."
+>
+  <!-- Hero -->
+  <section class="section relative overflow-hidden">
+    <div class="absolute inset-0 hero-gradient"></div>
+    <div class="container-custom relative">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background-light border border-themed mb-8">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span class="text-sm text-foreground-muted">AI gateway &middot; MCP native &middot; AGPLv3</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
+          One AI gateway,
+          <span class="text-gradient">both directions</span>
+        </h1>
+
+        <p class="text-lg sm:text-xl text-foreground-muted max-w-3xl mx-auto mb-10">
+          Barbacane is the open-source, Rust-native AI gateway that handles AI traffic on
+          the way out and on the way in. Route your application's LLM calls through OpenAI,
+          Anthropic, or Ollama with provider fallback and policy routing. Expose your
+          existing APIs to AI agents as typed MCP tools. Same gateway, same middleware,
+          same spec.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#outbound" class="btn-primary text-lg px-8 py-4">
+            See how it works
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+            </svg>
+          </a>
+          <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="btn-secondary text-lg px-8 py-4">
+            <svg class="mr-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- At a glance -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            AI traffic has two directions
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
+            Most AI gateways only handle one. Barbacane handles both, from the same spec,
+            with the same middleware chain.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+          <a href="#outbound" class="card hover:border-primary/50 transition-colors">
+            <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-3">Outbound: your app calls LLMs</h3>
+            <p class="text-foreground-muted mb-4">
+              The <code class="text-primary">ai-proxy</code> dispatcher routes requests to
+              OpenAI, Anthropic, Ollama, or any OpenAI-compatible endpoint. Unified
+              OpenAI-compatible API surface, pinned provider contracts, provider fallback,
+              named targets for policy routing.
+            </p>
+            <span class="text-primary text-sm inline-flex items-center gap-1">
+              Jump to outbound
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </span>
+          </a>
+
+          <a href="#inbound" class="card hover:border-accent/50 transition-colors">
+            <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-3">Inbound: agents call your APIs</h3>
+            <p class="text-foreground-muted mb-4">
+              Your OpenAPI spec compiles into an MCP tool server. Agents discover tools
+              via JSON-RPC 2.0, tool calls pass through your existing auth and rate-limit
+              middleware as regular HTTP requests. Opt-out per operation.
+            </p>
+            <span class="text-accent text-sm inline-flex items-center gap-1">
+              Jump to inbound
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Outbound section -->
+  <section id="outbound" class="section">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="mb-12">
+          <span class="text-sm font-semibold text-primary uppercase tracking-wide">Outbound</span>
+          <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-4">
+            Route your LLM calls, with <span class="text-gradient">fallback and policy</span>
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-3xl">
+            Clients send OpenAI-format requests. Barbacane's <code class="text-primary">ai-proxy</code>
+            dispatcher translates per provider, handles streaming where the provider
+            supports it, pins the upstream API version, and falls back to a secondary
+            provider when the primary fails.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8 items-start mb-12">
+          <div class="code-block-shiki rounded-lg text-sm overflow-auto">
+            <Code code={outboundYaml} lang="yaml" themes={codeThemes} />
+          </div>
+
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Providers</h3>
+              <p class="text-foreground-muted">
+                OpenAI, Anthropic, and Ollama out of the box. Any OpenAI-compatible server
+                (vLLM, TGI, LocalAI, Azure OpenAI) works via <code class="text-primary">provider: openai</code>
+                plus a custom <code class="text-primary">base_url</code>.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Pinned contracts</h3>
+              <p class="text-foreground-muted">
+                Provider adapters are built against a pinned API version. Upstream breaking
+                changes are a conscious, tested plugin upgrade, not a silent production
+                surprise.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Policy-driven routing</h3>
+              <p class="text-foreground-muted">
+                Named targets combine with the <code class="text-primary">cel</code>
+                middleware: stack CEL rules (consumer tier, scopes, headers) that set
+                <code class="text-primary">ai.target</code> in context, and the dispatcher
+                picks the matching target. Credentials stay in dispatcher config, never
+                in context.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Observability</h3>
+              <p class="text-foreground-muted">
+                Prometheus metrics for requests per provider, latency, token usage, and
+                fallback events. OpenTelemetry spans linked to the upstream call.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Inbound section -->
+  <section id="inbound" class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="mb-12">
+          <span class="text-sm font-semibold text-accent uppercase tracking-wide">Inbound</span>
+          <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-4">
+            Expose your APIs to agents as <span class="text-gradient">MCP tools</span>
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-3xl">
+            Enable MCP once at the spec root and every operation becomes an agent-callable
+            tool. Authentication, rate limits, validation, and audit logging all apply to
+            tool calls, because they are just HTTP requests in disguise.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8 items-start mb-12">
+          <div class="code-block-shiki rounded-lg text-sm overflow-auto">
+            <Code code={inboundYaml} lang="yaml" themes={codeThemes} />
+          </div>
+
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Agents discover your tools</h3>
+              <p class="text-foreground-muted">
+                Barbacane exposes a JSON-RPC 2.0 MCP endpoint at
+                <code class="text-primary">/__barbacane/mcp</code>. Each operation becomes
+                a typed tool, with the name taken from <code class="text-primary">operationId</code>,
+                the description from <code class="text-primary">summary</code>, and input
+                and output schemas merged from your parameters, body, and responses.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Calls run through your middleware</h3>
+              <p class="text-foreground-muted">
+                Tool calls are HTTP requests. They pass through authentication, authorization,
+                rate limits, validation, transformations, and observability like any other
+                request. No shadow stack, no drift.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Opt out what agents should not see</h3>
+              <p class="text-foreground-muted">
+                By default every operation is a tool. Add
+                <code class="text-primary">x-barbacane-mcp: &#123; enabled: false &#125;</code>
+                to any operation you want to hide, such as admin endpoints or destructive
+                actions.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Shift-left lint</h3>
+              <p class="text-foreground-muted">
+                The <a href="https://docs.barbacane.dev/guide/vacuum.html" class="text-primary hover:underline">vacuum ruleset</a>
+                runs in your editor, pre-commit, or CI. Missing
+                <code class="text-primary">operationId</code>s and descriptions fail at
+                lint time, not at call time.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI governance (shared) -->
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            AI governance, <span class="text-gradient">both directions</span>
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
+            Four middlewares compose around the dispatcher, regardless of whether traffic
+            is outbound to an LLM or inbound from an agent. Named profiles, CEL expressions,
+            fail-closed on misconfiguration.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">ai-prompt-guard</h3>
+            <p class="text-foreground-muted text-sm">
+              PII redaction, regex allow and deny lists, message count and length limits,
+              managed system-prompt templates with variable substitution. Regex is compiled
+              at lint time.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">ai-token-limit</h3>
+            <p class="text-foreground-muted text-sm">
+              Token-based sliding-window rate limiting per consumer, per model, per window.
+              Stack instances for minute-and-hour caps. Same partition keys on
+              <code class="text-primary">on_request</code> and
+              <code class="text-primary">on_response</code>.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">ai-cost-tracker</h3>
+            <p class="text-foreground-muted text-sm">
+              Per-request USD metric derived from a configurable price table. Emits the
+              <code class="text-primary">cost_dollars</code> Prometheus counter labelled
+              by provider, model, and consumer.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">ai-response-guard</h3>
+            <p class="text-foreground-muted text-sm">
+              PII regex redaction and blocked-pattern 502 rewrite on responses. Schema
+              re-validation before the response leaves the gateway. Fail-closed on
+              misconfiguration or invalid regex.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- One gateway argument -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-8 text-center">
+          One gateway, not three
+        </h2>
+        <p class="text-lg text-foreground-muted mb-5">
+          Most AI-gateway products specialize in one direction. The outbound specialists
+          (Portkey, LiteLLM, Cloudflare AI Gateway) are good at LLM routing and cost
+          control, and nothing else. The inbound specialists (the small but growing MCP
+          gateway category) handle agent tool calls and ignore outbound traffic. The API
+          gateways you already run (Kong, Tyk, Apigee) handle neither.
+        </p>
+        <p class="text-lg text-foreground-muted mb-5">
+          Running three separate products in the request path is a valid architecture. It
+          is also three config files, three observability stacks, three blast radiuses, and
+          three sets of middleware that look similar but are not composable with each
+          other. Shadow stacks grow in that gap.
+        </p>
+        <p class="text-lg text-foreground-muted">
+          Barbacane collapses the three into one by treating AI gateway as composition:
+          the same dispatchers, the same middleware plugins, the same spec-first config
+          surface cover API gateway fundamentals, outbound AI proxy, and inbound MCP. You
+          can still adopt one direction at a time. You do not have to adopt three separate
+          products to do it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use cases -->
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">Built for these teams</h2>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+          <div class="card">
+            <h3 class="text-xl font-bold mb-3 text-primary">AI product builders</h3>
+            <p class="text-foreground-muted mb-4">
+              Ship agents that call your production APIs safely and call LLMs cost-effectively.
+              One gateway for both sides of the agent loop.
+            </p>
+            <ul class="space-y-2 text-foreground-muted text-sm">
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Provider fallback on the outbound side</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Typed MCP tools from OpenAPI on the inbound side</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Single cost dashboard across both</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3 class="text-xl font-bold mb-3 text-secondary">Platform teams</h3>
+            <p class="text-foreground-muted mb-4">
+              Give every product team policy-compliant AI infrastructure: outbound for
+              their app's LLM calls, inbound for their APIs' agent exposure. One control
+              plane, one audit trail.
+            </p>
+            <ul class="space-y-2 text-foreground-muted text-sm">
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Central policy via CEL, OPA, or consumer ACLs</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Per-tenant cost attribution end-to-end</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>No per-team MCP server sprawl</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3 class="text-xl font-bold mb-3 text-accent">Regulated-industry CIOs</h3>
+            <p class="text-foreground-muted mb-4">
+              AI traffic your security, audit, and compliance teams can approve. Single
+              gateway, clear blast radius, fail-closed defaults, FIPS 140-3 option.
+            </p>
+            <ul class="space-y-2 text-foreground-muted text-sm">
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>AGPLv3, no vendor lock-in</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Self-hostable on-prem or air-gapped</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Artifact provenance and drift detection</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-10 text-center">Frequently asked</h2>
+
+        <div class="space-y-6">
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">How is this different from Portkey or LiteLLM?</h3>
+            <p class="text-foreground-muted">
+              They are outbound-only AI gateways. Barbacane handles both directions plus
+              API gateway fundamentals, from one spec, with one middleware chain. Full
+              comparison in
+              <a href="/blog/barbacane-vs-portkey-litellm/" class="text-primary hover:underline">this post</a>.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Which LLM providers are supported on the outbound side?</h3>
+            <p class="text-foreground-muted">
+              OpenAI, Anthropic, and Ollama out of the box, with pinned upstream API
+              versions. Any OpenAI-compatible server (vLLM, TGI, LocalAI, Azure OpenAI,
+              self-hosted inference) works via <code class="text-primary">provider: openai</code>
+              plus a custom <code class="text-primary">base_url</code>.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Which MCP transport is supported on the inbound side?</h3>
+            <p class="text-foreground-muted">
+              JSON-RPC 2.0 over HTTP POST on <code class="text-primary">/__barbacane/mcp</code>.
+              Session termination via DELETE on the same path.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Can I adopt one direction without the other?</h3>
+            <p class="text-foreground-muted">
+              Yes. The two directions are independent. You can run Barbacane as an
+              outbound-only AI proxy, an inbound-only MCP gateway, or both, depending on
+              which <code class="text-primary">x-barbacane-*</code> extensions your spec
+              uses.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Do the AI governance middlewares apply to both directions?</h3>
+            <p class="text-foreground-muted">
+              Yes. <code class="text-primary">ai-prompt-guard</code>,
+              <code class="text-primary">ai-token-limit</code>,
+              <code class="text-primary">ai-cost-tracker</code>, and
+              <code class="text-primary">ai-response-guard</code> compose around any
+              dispatcher. The same four middlewares govern outbound LLM calls and inbound
+              MCP tool calls, so your cost attribution, token caps, and scrubbing policies
+              live in one place.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Do I have to rewrite my existing APIs?</h3>
+            <p class="text-foreground-muted">
+              No. Add <code class="text-primary">x-barbacane-*</code> extensions to your
+              existing OpenAPI spec. Barbacane compiles it into an artifact that speaks
+              both regular HTTP and MCP to the same upstream services.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Does authentication pass through?</h3>
+            <p class="text-foreground-muted">
+              On the inbound side, the <code class="text-primary">Authorization</code>
+              header from the MCP request is forwarded into the internal dispatch; your
+              <code class="text-primary">jwt-auth</code>,
+              <code class="text-primary">apikey-auth</code>, or OAuth2 middleware
+              validates it like any other request. On the outbound side, provider
+              credentials stay in dispatcher config and never leave it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <div class="card cta-gradient text-center p-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            Ready to make AI one of your gateway's concerns, not a parallel stack?
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-2xl mx-auto mb-8">
+            Read the docs, star the repo, or bring Barbacane into an internal platform
+            pilot.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="https://docs.barbacane.dev/guide/dispatchers.html#ai-proxy" class="btn-primary text-lg px-8 py-4">
+              Read the docs
+            </a>
+            <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="btn-secondary text-lg px-8 py-4">
+              View on GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

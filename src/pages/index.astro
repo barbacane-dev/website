@@ -1,8 +1,68 @@
 ---
+import { Code } from 'astro:components';
 import Layout from '../layouts/Layout.astro';
+
+const mcpYaml = `# Enable MCP for the whole API
+x-barbacane-mcp:
+  enabled: true
+  server_name: Orders API
+  server_version: 1.0.0
+
+paths:
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      summary: Fetch an order by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+  /admin/orders/purge:
+    delete:
+      operationId: purgeOrders
+      summary: Purge archived orders
+      # Hide this one from agents
+      x-barbacane-mcp:
+        enabled: false
+`;
+
+const aiProxyYaml = `paths:
+  /v1/chat/completions:
+    post:
+      operationId: chatCompletion
+      summary: Route LLM chat completion
+      x-barbacane-dispatch:
+        name: ai-proxy
+        config:
+          provider: openai
+          model: gpt-4o
+          api_key: "\${OPENAI_API_KEY}"
+
+          # Tried in order on 5xx / timeout
+          fallback:
+            - provider: anthropic
+              model: claude-sonnet-4-20250514
+              api_key: "\${ANTHROPIC_API_KEY}"
+            - provider: ollama
+              model: llama3
+              base_url: http://ollama:11434
+`;
+
+const codeThemes = { light: 'github-light', dark: 'github-dark' };
 ---
 
-<Layout title="Barbacane - The Spec-Driven API Gateway">
+<Layout title="Barbacane - Open-source AI gateway for LLMs and MCP">
   <!-- Hero Section -->
   <section class="section relative overflow-hidden">
     <div class="absolute inset-0 hero-gradient"></div>
@@ -10,22 +70,24 @@ import Layout from '../layouts/Layout.astro';
       <div class="max-w-4xl mx-auto text-center">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background-light border border-themed mb-8">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          <span class="text-sm text-foreground-muted">Open Source &middot; AGPLv3</span>
+          <span class="text-sm text-foreground-muted">Open source &middot; AI gateway &middot; AGPLv3</span>
         </div>
 
         <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
-          Your spec is your
-          <span class="text-gradient">gateway</span>
+          One AI gateway,
+          <span class="text-gradient">both directions</span>
         </h1>
 
-        <p class="text-lg sm:text-xl text-foreground-muted max-w-2xl mx-auto mb-10">
-          Stop maintaining two sources of truth. Barbacane uses your OpenAPI and AsyncAPI
-          specifications as the single source of truth for routing, validation, authentication, authorization, and event bridging.
+        <p class="text-lg sm:text-xl text-foreground-muted max-w-3xl mx-auto mb-10">
+          Barbacane handles AI traffic on the way out and on the way in. Route your
+          application's LLM calls through OpenAI, Anthropic, or Ollama with provider
+          fallback and policy routing. Expose your existing APIs to AI agents as typed
+          MCP tools. Same gateway, same middleware, same spec.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="#get-started" class="btn-primary text-lg px-8 py-4">
-            Get Started
+          <a href="/ai/" class="btn-primary text-lg px-8 py-4">
+            Explore the AI gateway
             <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
             </svg>
@@ -36,6 +98,188 @@ import Layout from '../layouts/Layout.astro';
             </svg>
             View on GitHub
           </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MCP Quickstart Section -->
+  <section id="mcp-quickstart" class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            Your OpenAPI becomes an <span class="text-gradient">MCP server</span>
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
+            Enable MCP once at the spec root and your existing API is agent-callable.
+            Authentication, rate limits, validation, and audit logging all apply to tool
+            calls, because they are just HTTP requests in disguise.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8 items-start">
+          <div class="code-block-shiki rounded-lg text-sm overflow-auto">
+            <Code code={mcpYaml} lang="yaml" themes={codeThemes} />
+          </div>
+
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Agents discover your tools</h3>
+              <p class="text-foreground-muted">
+                Barbacane exposes a JSON-RPC 2.0 MCP endpoint at
+                <code class="text-primary">/__barbacane/mcp</code>. Each operation becomes a
+                typed tool, with the name taken from <code class="text-primary">operationId</code>,
+                the description from <code class="text-primary">summary</code>, and input and
+                output schemas merged from your parameters, body, and responses.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Calls run through your middleware</h3>
+              <p class="text-foreground-muted">
+                Tool calls are HTTP requests. They pass through authentication, authorization,
+                rate limits, validation, transformations, and observability like any other
+                request. No shadow stack, no drift.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Opt out what agents should not see</h3>
+              <p class="text-foreground-muted">
+                By default every operation is a tool. Add
+                <code class="text-primary">x-barbacane-mcp: &#123; enabled: false &#125;</code>
+                to any operation you want to hide, such as admin endpoints or destructive
+                actions.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Outbound AI Proxy Section -->
+  <section id="ai-proxy-outbound" class="section">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            Your app calls LLMs through <span class="text-gradient">one dispatcher</span>
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
+            Route outbound LLM requests through OpenAI, Anthropic, or Ollama with provider
+            fallback, policy-driven targets, and the same middleware chain you use for
+            every other request.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8 items-start">
+          <div class="code-block-shiki rounded-lg text-sm overflow-auto">
+            <Code code={aiProxyYaml} lang="yaml" themes={codeThemes} />
+          </div>
+
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Clients send OpenAI format</h3>
+              <p class="text-foreground-muted">
+                The <code class="text-primary">ai-proxy</code> dispatcher exposes a
+                unified OpenAI-compatible API surface and translates per provider
+                internally. Pinned upstream API versions make breaking changes a
+                deliberate plugin upgrade, not a silent production incident.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Fallback on failure</h3>
+              <p class="text-foreground-muted">
+                When the primary provider returns 5xx or times out, the dispatcher tries
+                the next target in the fallback chain. 4xx errors (content policy, invalid
+                model) return directly to the client.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Policy-driven targets</h3>
+              <p class="text-foreground-muted">
+                Stack <code class="text-primary">cel</code> middleware rules to set
+                <code class="text-primary">ai.target</code> in context based on consumer
+                tier, scopes, or headers. Credentials stay in dispatcher config, never in
+                context.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-10 text-center">
+          <a href="/ai/" class="btn-secondary">Read the full AI gateway story</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI Governance Section -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            AI governance, built in
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
+            Four middlewares compose like any other Barbacane plugin. Named profiles,
+            CEL expressions, fail-closed on misconfiguration.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Prompt guard</h3>
+            <p class="text-foreground-muted text-sm">
+              PII redaction, regex allow and deny lists, shape constraints on inbound prompts.
+              Shift-left validation at lint time.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Token limits</h3>
+            <p class="text-foreground-muted text-sm">
+              Token-based sliding windows per consumer, per operation, per tenant.
+              Stop runaway agents before they cost you money.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Cost tracking</h3>
+            <p class="text-foreground-muted text-sm">
+              Per-operation spend observability as Prometheus metrics. Budget alerts and
+              cost attribution across tenants and agents.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Response guard</h3>
+            <p class="text-foreground-muted text-sm">
+              Output scrubbing, schema re-validation, and policy checks before responses
+              reach the agent. Fail closed on misconfiguration.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -134,14 +378,28 @@ import Layout from '../layouts/Layout.astro';
     <div class="container-custom">
       <div class="max-w-4xl mx-auto text-center mb-16">
         <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-          Everything you need in an API gateway
+          One gateway for your <span class="text-gradient">APIs</span> and your <span class="text-gradient">agents</span>
         </h2>
         <p class="text-xl text-foreground-muted">
-          Built in Rust for speed and safety. Extended with WebAssembly for flexibility.
+          AI-native features on top of a production-grade, spec-first gateway.
+          Rust for speed and safety, WebAssembly plugins for extensibility.
         </p>
       </div>
 
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 00.659 1.591L19 14.5M14.25 3.104c.251.023.501.05.75.082M19 14.5l-2.47 2.47a2.25 2.25 0 01-1.591.659H9.061a2.25 2.25 0 01-1.591-.659L5 14.5m14 0V17a2 2 0 01-2 2H7a2 2 0 01-2-2v-2.5"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">MCP server for AI agents</h3>
+          <p class="text-foreground-muted">
+            Expose your API operations as AI-callable tools via the Model Context Protocol.
+            AI agents discover and call endpoints through JSON-RPC 2.0, one extension to enable.
+          </p>
+        </div>
+
         <div class="card">
           <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
             <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,10 +445,11 @@ import Layout from '../layouts/Layout.astro';
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-2">29 WASM Plugins</h3>
+          <h3 class="text-xl font-semibold mb-2">Every plugin you need</h3>
           <p class="text-foreground-muted">
-            29 official plugins covering auth, security, traffic control, transformations, and observability.
-            Sandboxed WebAssembly execution means plugins can't crash your gateway.
+            A full suite of built-in WebAssembly plugins for auth, security, traffic
+            control, transformations, and observability. Sandboxed execution means a
+            faulty plugin cannot crash the gateway.
           </p>
         </div>
 
@@ -249,13 +508,13 @@ import Layout from '../layouts/Layout.astro';
         <div class="card">
           <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
             <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-2">Edge Ready</h3>
+          <h3 class="text-xl font-semibold mb-2">AI prompt guard</h3>
           <p class="text-foreground-muted">
-            Service planes are lightweight compiled artifacts. Deploy anywhere &mdash;
-            cloud, on-prem, edge locations, or embedded devices.
+            PII redaction, regex allow and deny lists, and schema constraints on inbound
+            prompts. Shift-left validation at lint time, fail-closed in production.
           </p>
         </div>
 
@@ -288,13 +547,13 @@ import Layout from '../layouts/Layout.astro';
         <div class="card">
           <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
             <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-2">S3 Storage Proxy</h3>
+          <h3 class="text-xl font-semibold mb-2">AI token limits</h3>
           <p class="text-foreground-muted">
-            Proxy requests to AWS S3 or S3-compatible storage (MinIO, RustFS, Ceph) with
-            SigV4 signing. Single-bucket CDN or multi-bucket routing.
+            Token-based sliding windows per consumer, per operation, per tenant. Stop
+            runaway agents before they cost you money.
           </p>
         </div>
 
@@ -314,26 +573,13 @@ import Layout from '../layouts/Layout.astro';
         <div class="card">
           <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
             <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-2">Bot Detection</h3>
+          <h3 class="text-xl font-semibold mb-2">AI cost tracking</h3>
           <p class="text-foreground-muted">
-            Block scrapers and unwanted bots by User-Agent pattern matching.
-            Allow/deny lists with configurable responses.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 00.659 1.591L19 14.5M14.25 3.104c.251.023.501.05.75.082M19 14.5l-2.47 2.47a2.25 2.25 0 01-1.591.659H9.061a2.25 2.25 0 01-1.591-.659L5 14.5m14 0V17a2 2 0 01-2 2H7a2 2 0 01-2-2v-2.5"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">MCP Server for AI Agents</h3>
-          <p class="text-foreground-muted">
-            Expose your API operations as AI-callable tools via the Model Context Protocol.
-            AI agents discover and call endpoints through JSON-RPC 2.0 &mdash; one extension to enable.
+            Per-operation LLM spend as Prometheus metrics. Budget alerts and cost
+            attribution across tenants, teams, and agents.
           </p>
         </div>
 
@@ -366,13 +612,13 @@ import Layout from '../layouts/Layout.astro';
         <div class="card">
           <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
             <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-2">Remote Plugin Loading</h3>
+          <h3 class="text-xl font-semibold mb-2">AI response guard</h3>
           <p class="text-foreground-muted">
-            Load plugins from HTTPS URLs at compile time with optional SHA-256 integrity verification.
-            Local cache with checksum-based invalidation for fast rebuilds.
+            Output scrubbing, schema re-validation, and policy checks before responses
+            reach the agent. Fail closed on misconfiguration.
           </p>
         </div>
       </div>
