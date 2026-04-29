@@ -4,7 +4,7 @@ description: "Portkey, LiteLLM, and Barbacane all ship an outbound AI gateway. W
 publishDate: 2026-04-29
 author: "Nicolas Dreno"
 tags: ["ai-gateway", "mcp-gateway", "portkey", "litellm", "comparison", "model-context-protocol", "ai-governance"]
-draft: true
+draft: false
 ---
 
 *If you are picking an AI gateway in 2026, Portkey, LiteLLM, and Barbacane are all real options. They overlap enough to make the choice real, and they differ enough that the right answer depends on what else you want your gateway to do.*
