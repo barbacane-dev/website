@@ -37,12 +37,17 @@ function selectChannels(filter) {
   });
 }
 
-async function processArticle(article, channels, dryRun) {
+// Processes one article across all channels. A failure on one channel
+// (findExisting or post) is logged and recorded but does not prevent
+// the remaining channels from being attempted - one channel's outage
+// shouldn't block another channel's publish.
+export async function processArticle(article, channels, dryRun) {
   console.log(`\n=== ${article.slug} ===`);
   console.log(`  title:     ${article.title}`);
   console.log(`  canonical: ${article.canonical_url}`);
   console.log(`  body:      ${article.body_markdown.length} chars`);
 
+  let anyFailed = false;
   for (const channel of channels) {
     const label = `[${channel.name}]`;
     if (!channel.isConfigured()) {
@@ -55,7 +60,8 @@ async function processArticle(article, channels, dryRun) {
       existing = await channel.findExisting(article);
     } catch (e) {
       console.error(`  ${label} could not check for existing post: ${e.message}`);
-      throw e;
+      anyFailed = true;
+      continue;
     }
     if (existing) {
       console.log(`  ${label} already posted: ${existing.url} (skipping)`);
@@ -72,9 +78,10 @@ async function processArticle(article, channels, dryRun) {
       console.log(`  ${label} ✓ posted: ${result.url}`);
     } catch (e) {
       console.error(`  ${label} ✗ failed: ${e.message}`);
-      throw e;
+      anyFailed = true;
     }
   }
+  return { anyFailed };
 }
 
 async function main() {
@@ -99,16 +106,16 @@ async function main() {
 
   let failed = false;
   for (const f of files) {
-    try {
-      await processArticle(loadArticle(f), channels, args.dryRun);
-    } catch {
-      failed = true;
-    }
+    const { anyFailed } = await processArticle(loadArticle(f), channels, args.dryRun);
+    if (anyFailed) failed = true;
   }
   if (failed) process.exit(1);
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+// Only run main() when invoked as a script, not when imported by tests.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}
