@@ -67,38 +67,35 @@ async function resolvePublicationId() {
 
 // Looks up an existing post by slug within the publication. Returns
 // { url } if found, else null.
+// Pages through the publication's posts and matches on `canonicalUrl`
+// (Hashnode's read-side name for the input field `originalArticleURL`).
+// Slug-based matching breaks when Hashnode appends `-1`, `-2`, etc. on
+// publish (e.g. when the desired slug collides with a soft-deleted post),
+// but the canonicalUrl always equals our `article.canonical_url`.
 export async function findExisting(article) {
   const publicationId = await resolvePublicationId();
-  const data = await gql(
-    `
-    query Pub($id: ObjectId!) {
-      publication(id: $id) {
-        url
-        post(slug: $slug) { id url slug }
-      }
-    }
-    `,
-    { id: publicationId, slug: article.slug },
-  ).catch(async () => {
-    // Some Hashnode schemas expose `post(slug:)` only via host. Fall back
-    // to listing posts and matching slug.
-    const pub = await gql(
+  let cursor = null;
+  while (true) {
+    const data = await gql(
       `
-      query PubPosts($id: ObjectId!, $first: Int!) {
+      query PubPosts($id: ObjectId!, $first: Int!, $after: String) {
         publication(id: $id) {
-          posts(first: $first) {
-            edges { node { slug url } }
+          posts(first: $first, after: $after) {
+            edges { node { slug url canonicalUrl } }
+            pageInfo { hasNextPage endCursor }
           }
         }
       }
       `,
-      { id: publicationId, first: 50 },
+      { id: publicationId, first: 50, after: cursor },
     );
-    const match = pub?.publication?.posts?.edges?.find((e) => e.node.slug === article.slug);
-    return match ? { publication: { post: match.node } } : null;
-  });
-  const post = data?.publication?.post;
-  return post ? { url: post.url } : null;
+    const conn = data?.publication?.posts;
+    if (!conn) return null;
+    const match = (conn.edges || []).find((e) => e.node.canonicalUrl === article.canonical_url);
+    if (match) return { url: match.node.url };
+    if (!conn.pageInfo?.hasNextPage) return null;
+    cursor = conn.pageInfo.endCursor;
+  }
 }
 
 // Hashnode tag input requires { slug, name }. Slugs are lowercase-hyphenated.
