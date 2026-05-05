@@ -1,13 +1,16 @@
-name: Update Hashnode post
+name: Update cross-posts
 
 on:
   workflow_dispatch:
     inputs:
       slug:
-        description: 'Slug to re-push to Hashnode (uses current source markdown)'
+        description: 'Slug to re-push (uses current source markdown)'
         required: true
+      channels:
+        description: 'Comma-separated channel filter (e.g. devto,hashnode). Empty = all updatable channels.'
+        required: false
       dry_run:
-        description: 'Dry run (look up post, do not update)'
+        description: 'Dry run (look up posts, do not update)'
         type: boolean
         default: true
 
@@ -24,13 +27,17 @@ jobs:
 
       - run: npm ci
 
-      - name: Update Hashnode
+      - name: Update cross-posts
         env:
+          DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
           HASHNODE_TOKEN: ${{ secrets.HASHNODE_TOKEN }}
           HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
         run: |
           ARGS="--slug=${{ github.event.inputs.slug }}"
+          if [ -n "${{ github.event.inputs.channels }}" ]; then
+            ARGS="$ARGS --channels=${{ github.event.inputs.channels }}"
+          fi
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             ARGS="$ARGS --dry-run"
           fi
-          node scripts/update-hashnode.mjs $ARGS
+          node scripts/update-cross-post.mjs $ARGS

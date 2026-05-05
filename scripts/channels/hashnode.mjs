@@ -66,7 +66,8 @@ async function resolvePublicationId() {
 }
 
 // Looks up an existing post by slug within the publication. Returns
-// { url } if found, else null.
+// { id, url } if found, else null. The id is needed by update() to issue
+// the updatePost mutation.
 // Pages through the publication's posts and matches on `canonicalUrl`
 // (Hashnode's read-side name for the input field `originalArticleURL`).
 // Slug-based matching breaks when Hashnode appends `-1`, `-2`, etc. on
@@ -81,7 +82,7 @@ export async function findExisting(article) {
       query PubPosts($id: ObjectId!, $first: Int!, $after: String) {
         publication(id: $id) {
           posts(first: $first, after: $after) {
-            edges { node { slug url canonicalUrl } }
+            edges { node { id slug url canonicalUrl } }
             pageInfo { hasNextPage endCursor }
           }
         }
@@ -92,7 +93,7 @@ export async function findExisting(article) {
     const conn = data?.publication?.posts;
     if (!conn) return null;
     const match = (conn.edges || []).find((e) => e.node.canonicalUrl === article.canonical_url);
-    if (match) return { url: match.node.url };
+    if (match) return { id: match.node.id, url: match.node.url };
     if (!conn.pageInfo?.hasNextPage) return null;
     cursor = conn.pageInfo.endCursor;
   }
@@ -136,5 +137,32 @@ export async function post(article) {
   );
   const url = data?.publishPost?.post?.url;
   if (!url) throw new Error(`Hashnode: missing url in response: ${JSON.stringify(data)}`);
+  return { url };
+}
+
+// Re-pushes the current article body to an existing post via updatePost.
+// Only fields that may have drifted (title, body, description, tags) are
+// sent; the slug and originalArticleURL are intentionally not changed.
+export async function update(article, existing) {
+  const data = await gql(
+    `
+    mutation Update($input: UpdatePostInput!) {
+      updatePost(input: $input) { post { id url } }
+    }
+    `,
+    {
+      input: {
+        id: existing.id,
+        title: article.title,
+        contentMarkdown: article.body_markdown,
+        tags: transformTags(article.tags),
+        metaTags: {
+          description: article.description,
+        },
+      },
+    },
+  );
+  const url = data?.updatePost?.post?.url;
+  if (!url) throw new Error(`Hashnode: missing url in updatePost response: ${JSON.stringify(data)}`);
   return { url };
 }
