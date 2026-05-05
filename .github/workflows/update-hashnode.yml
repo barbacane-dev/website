@@ -1,0 +1,36 @@
+name: Update Hashnode post
+
+on:
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: 'Slug to re-push to Hashnode (uses current source markdown)'
+        required: true
+      dry_run:
+        description: 'Dry run (look up post, do not update)'
+        type: boolean
+        default: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Update Hashnode
+        env:
+          HASHNODE_TOKEN: ${{ secrets.HASHNODE_TOKEN }}
+          HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
+        run: |
+          ARGS="--slug=${{ github.event.inputs.slug }}"
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          node scripts/update-hashnode.mjs $ARGS
