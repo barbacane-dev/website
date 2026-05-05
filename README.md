@@ -37,7 +37,3 @@ src/
 └── styles/         # Global styles
 public/             # Static assets
 ```
-
-## License
-
-Apache-2.0

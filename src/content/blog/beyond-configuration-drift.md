@@ -253,4 +253,4 @@ The goal: your API contract *is* your production configuration. Security policie
 
 ---
 
-*Barbacane is open source (Apache 2.0) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). As of February 2026, it remains an early-stage project—evaluate thoroughly before production use.*
+*Barbacane is open source (AGPLv3) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). As of February 2026, it remains an early-stage project—evaluate thoroughly before production use.*

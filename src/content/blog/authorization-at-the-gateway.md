@@ -278,4 +278,4 @@ The [middleware documentation](https://docs.barbacane.dev/guide/middlewares.html
 
 ---
 
-*Barbacane is open source (Apache 2.0) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). The CEL and OPA authorization plugins ship with v0.1.x. Try them against your specs and let us know what works.*
+*Barbacane is open source (AGPLv3) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). The CEL and OPA authorization plugins ship with v0.1.x. Try them against your specs and let us know what works.*

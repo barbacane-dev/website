@@ -103,7 +103,7 @@ A roadmap is defined as much by what's absent as by what's present. Here are rec
 
 **"Build a plugin marketplace."** Barbacane plugins are WASM modules compiled from Rust via Wasmtime with AOT compilation. A marketplace would incentivize quantity over quality and create a maintenance surface we can't control. We've shipped over a dozen first-party plugins, from basic auth to correlation IDs to request size limits, and we'd rather have twelve solid plugins than a hundred fragile ones.
 
-**"Create an enterprise edition."** I've lived through the open-core playbook from the inside. Kong's split between Gateway OSS and Kong Enterprise, Tyk's gated dashboard and developer portal, Gravitee's community-versus-enterprise feature matrix: I've seen how this plays out. The community version gets slower updates, the best features land behind a paywall, and contributors eventually realize they're building someone else's commercial product. Barbacane is fully open source under Apache 2.0. There is no enterprise edition. We generate revenue through professional services, not feature paywalls.
+**"Create an enterprise edition."** I've lived through the open-core playbook from the inside. Kong's split between Gateway OSS and Kong Enterprise, Tyk's gated dashboard and developer portal, Gravitee's community-versus-enterprise feature matrix: I've seen how this plays out. The community version gets slower updates, the best features land behind a paywall, and contributors eventually realize they're building someone else's commercial product. Barbacane's source is AGPLv3. There is no enterprise edition, no paid tier of features. We do offer a commercial license for organisations that cannot comply with AGPL copyleft (typically SaaS vendors building on top of Barbacane), but it unlocks the *same* code, not extra capabilities. Revenue comes from that commercial license and from professional services, not from feature paywalls.
 
 ---
 
@@ -134,4 +134,4 @@ If you have ideas, constraints, or feedback that should inform our next decision
 
 ---
 
-*Barbacane is open source (Apache 2.0) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). Check the [documentation](https://docs.barbacane.dev/) for the full CLI reference and getting started guide.*
+*Barbacane is open source (AGPLv3) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). Check the [documentation](https://docs.barbacane.dev/) for the full CLI reference and getting started guide.*

@@ -189,4 +189,4 @@ It's not a silver bullet. Cross-service consistency is a hard problem, and route
 
 ---
 
-*Barbacane is open source (Apache 2.0) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). Check the [documentation](https://docs.barbacane.dev/) for the full CLI reference and getting started guide.*
+*Barbacane is open source (AGPLv3) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). Check the [documentation](https://docs.barbacane.dev/) for the full CLI reference and getting started guide.*
