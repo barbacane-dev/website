@@ -1,10 +1,52 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const faq = [
+  {
+    question: "How is this different from Kong, Apigee, or Tyk?",
+    answer: "Those gateways ship with their own config DSL. Your OpenAPI spec is a parallel document you have to keep in sync with the gateway. Barbacane inverts that: the spec is the config. There is no second source of truth to drift from.",
+  },
+  {
+    question: "Does it work with my existing OpenAPI specs?",
+    answer: "Yes. Add x-barbacane-* extensions where you need gateway behaviour. Existing fields (security schemes, parameters, responses) are already interpreted. Specs stay portable to other tools.",
+  },
+  {
+    question: "Can I add custom logic?",
+    answer: "Yes, via WebAssembly plugins. Barbacane ships a full suite of official plugins and lets you write your own in any WASM-compiling language. Plugins are sandboxed, so a faulty plugin cannot crash the gateway.",
+  },
+  {
+    question: "How does it deploy?",
+    answer: "A compiled artifact is a single binary. Run it anywhere: Kubernetes, bare metal, on-prem VMs, edge locations, air-gapped environments. The control plane and data planes are independent, so data planes keep serving even if the control plane is offline.",
+  },
+  {
+    question: "AGPLv3. Can I use it commercially?",
+    answer: "Yes. Small teams and non-profits get a free commercial license. Larger organisations can buy a paid commercial license. Either way, every feature is open source, no gated enterprise tier. See /pricing/ for details.",
+  },
+  {
+    question: "Does it support event-driven systems?",
+    answer: "Yes. Barbacane reads AsyncAPI specs and bridges HTTP to Kafka, NATS, or AWS Lambda. The same spec-first, compile-safe workflow applies.",
+  },
+  {
+    question: "Does this extend to AI traffic?",
+    answer: "Yes. The same spec-first model covers outbound LLM routing (via the ai-proxy dispatcher) and inbound MCP for AI agents. Platform teams often use Barbacane for all three on the same gateway. See /ai/ for that side of the story.",
+  },
+];
+
+const faqStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faq.map((item) => ({
+    "@type": "Question",
+    "name": item.question,
+    "acceptedAnswer": { "@type": "Answer", "text": item.answer },
+  })),
+};
 ---
 
 <Layout
   title="Spec-first API gateway for platform teams - Barbacane"
   description="Barbacane turns your OpenAPI and AsyncAPI specs into your API gateway. No config drift, no reconciliation work, no hidden policy gaps. Rust-native, extensible via sandboxed WebAssembly plugins, control and data plane split."
+  structuredData={faqStructuredData}
 >
   <!-- Hero -->
   <section class="section relative overflow-hidden">

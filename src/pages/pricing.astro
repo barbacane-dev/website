@@ -1,8 +1,45 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const faq = [
+  {
+    question: "Is Barbacane really free?",
+    answer: "Yes. All features are available to everyone with no gating. The source code is published under AGPLv3, which is free to use as long as you comply with its copyleft terms. If you cannot comply with AGPLv3 (e.g. you want to run it as a managed service without publishing modifications), a commercial license is free for small teams (up to €1M ARR, 10 employees) and non-profits.",
+  },
+  {
+    question: "What if I do not need paid services?",
+    answer: "That is perfectly fine. Use Barbacane freely, contribute to the project if you can, and reach out when you need help. Our documentation, GitHub issues, and community channels are available to everyone.",
+  },
+  {
+    question: "Can you help with compliance requirements?",
+    answer: "Yes. Our consulting packages include compliance reviews for SOC 2, GDPR, HIPAA, and other frameworks. We help you configure Barbacane's logging, security policies, AI governance middlewares, and audit trails to meet your requirements.",
+  },
+  {
+    question: "Does this cover AI and MCP workloads?",
+    answer: "Yes. Barbacane's AI gateway capabilities (ai-proxy dispatcher, AI governance middlewares) and MCP gateway capabilities are part of the same software. The same licensing and services apply, whether you are using Barbacane for outbound LLM routing, inbound agent tool exposure, or as a full API gateway.",
+  },
+  {
+    question: "Do you offer on-premise deployment?",
+    answer: "Barbacane is designed to run anywhere: on-prem, in your cloud, at the edge, or air-gapped. We can help you design and implement the deployment architecture that fits your infrastructure and security requirements.",
+  },
+];
+
+const faqStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faq.map((item) => ({
+    "@type": "Question",
+    "name": item.question,
+    "acceptedAnswer": { "@type": "Answer", "text": item.answer },
+  })),
+};
 ---
 
-<Layout title="Barbacane pricing: open-source AI and MCP gateway, commercial license available" description="Barbacane is open source under AGPLv3. A commercial license is free for small teams and non-profits, paid for larger orgs. Same software either way - spec-first AI, MCP, and API gateway.">
+<Layout
+  title="Barbacane pricing: open-source AI and MCP gateway, commercial license available"
+  description="Barbacane is open source under AGPLv3. A commercial license is free for small teams and non-profits, paid for larger orgs. Same software either way - spec-first AI, MCP, and API gateway."
+  structuredData={faqStructuredData}
+>
   <!-- Hero -->
   <section class="section">
     <div class="container-custom">
