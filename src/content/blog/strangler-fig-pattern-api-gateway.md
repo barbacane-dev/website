@@ -300,4 +300,4 @@ By compiling OpenAPI into portable artifacts, enforcing safety at build time, an
 
 ---
 
-*Barbacane is open source and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). Questions or feedback? Reach us at [contact@barbacane.dev](mailto:contact@barbacane.dev).*
+*Barbacane is open source and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). For the broader picture of how Barbacane fits a platform-team migration, see [the platform page](/platform/). Questions or feedback? Reach us at [contact@barbacane.dev](mailto:contact@barbacane.dev).*
