@@ -127,4 +127,4 @@ At Barbacane we build that platform on the assumption that this is where things 
 
 ---
 
-*Barbacane is open source (AGPLv3) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). If MCP and agent-readiness are on your roadmap, [the /mcp page](/mcp/) is the short version of how we approach it.*
+*Barbacane is open source (AGPLv3) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). If MCP and agent-readiness are on your roadmap, [the /ai page](/ai/) is the short version of how we approach it.*

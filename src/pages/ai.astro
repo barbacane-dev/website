@@ -73,11 +73,53 @@ paths:
 `;
 
 const codeThemes = { light: 'github-light', dark: 'github-dark' };
+
+const faq = [
+  {
+    question: "How is this different from Portkey or LiteLLM?",
+    answer: "They are outbound-only AI gateways. Barbacane handles both directions plus API gateway fundamentals, from one spec, with one middleware chain. A full comparison is published at /blog/barbacane-vs-portkey-litellm/.",
+  },
+  {
+    question: "Which LLM providers are supported on the outbound side?",
+    answer: "OpenAI, Anthropic, and Ollama out of the box, with pinned upstream API versions. Any OpenAI-compatible server (vLLM, TGI, LocalAI, Azure OpenAI, self-hosted inference) works via provider: openai plus a custom base_url.",
+  },
+  {
+    question: "Which MCP transport is supported on the inbound side?",
+    answer: "JSON-RPC 2.0 over HTTP POST on /__barbacane/mcp. Session termination via DELETE on the same path.",
+  },
+  {
+    question: "Can I adopt one direction without the other?",
+    answer: "Yes. The two directions are independent. You can run Barbacane as an outbound-only AI proxy, an inbound-only MCP gateway, or both, depending on which x-barbacane-* extensions your spec uses.",
+  },
+  {
+    question: "Do the AI governance middlewares apply to both directions?",
+    answer: "Yes. ai-prompt-guard, ai-token-limit, ai-cost-tracker, and ai-response-guard compose around any dispatcher. The same four middlewares govern outbound LLM calls and inbound MCP tool calls, so your cost attribution, token caps, and scrubbing policies live in one place.",
+  },
+  {
+    question: "Do I have to rewrite my existing APIs?",
+    answer: "No. Add x-barbacane-* extensions to your existing OpenAPI spec. Barbacane compiles it into an artifact that speaks both regular HTTP and MCP to the same upstream services.",
+  },
+  {
+    question: "Does authentication pass through?",
+    answer: "On the inbound side, the Authorization header from the MCP request is forwarded into the internal dispatch; your jwt-auth, apikey-auth, or OAuth2 middleware validates it like any other request. On the outbound side, provider credentials stay in dispatcher config and never leave it.",
+  },
+];
+
+const faqStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faq.map((item) => ({
+    "@type": "Question",
+    "name": item.question,
+    "acceptedAnswer": { "@type": "Answer", "text": item.answer },
+  })),
+};
 ---
 
 <Layout
   title="AI gateway for MCP and LLMs - Barbacane"
   description="Barbacane is the open-source AI gateway that handles both directions. Outbound: route LLM calls through OpenAI, Anthropic, or Ollama with provider fallback and policy routing. Inbound: expose your APIs to AI agents as typed MCP tools. Rust-native, spec-first, composed from dispatchers and middlewares."
+  structuredData={faqStructuredData}
 >
   <!-- Hero -->
   <section class="section relative overflow-hidden">

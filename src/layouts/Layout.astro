@@ -11,6 +11,7 @@ interface Props {
     tags: string[];
   };
   ogImage?: string;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
@@ -19,13 +20,14 @@ const {
   type = 'website',
   article,
   ogImage: customOgImage,
+  structuredData: customStructuredData,
 } = Astro.props;
 
 const siteUrl = 'https://barbacane.dev';
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
 const ogImage = customOgImage || `${siteUrl}/og-image.png`;
 
-const structuredData = type === 'article' && article
+const defaultStructuredData = type === 'article' && article
   ? {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
@@ -46,7 +48,8 @@ const structuredData = type === 'article' && article
       "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalUrl },
       "keywords": article.tags.join(", "),
     }
-  : {
+  : Astro.url.pathname === '/'
+  ? {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "Barbacane",
@@ -56,7 +59,14 @@ const structuredData = type === 'article' && article
       "url": siteUrl,
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "author": { "@type": "Organization", "name": "Barbacane", "url": siteUrl },
-    };
+    }
+  : null;
+
+const structuredDataBlocks = customStructuredData
+  ? (Array.isArray(customStructuredData) ? customStructuredData : [customStructuredData])
+  : defaultStructuredData
+  ? [defaultStructuredData]
+  : [];
 ---
 
 <!doctype html>
@@ -121,7 +131,9 @@ const structuredData = type === 'article' && article
     <meta name="twitter:image" content={ogImage} />
 
     <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    {structuredDataBlocks.map((block) => (
+      <script type="application/ld+json" set:html={JSON.stringify(block)} />
+    ))}
   </head>
   <body>
     <nav class="fixed top-0 left-0 right-0 z-50 nav-bg backdrop-blur-lg border-b border-themed">
