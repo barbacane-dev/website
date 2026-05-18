@@ -14,10 +14,9 @@
 
 import * as bluesky from './channels/bluesky.mjs';
 import * as devto from './channels/devto.mjs';
-import * as hashnode from './channels/hashnode.mjs';
 import { detectNewlyPublished, loadArticle, resolvePosts } from './lib/post-source.mjs';
 
-const ALL_CHANNELS = [devto, hashnode, bluesky];
+const ALL_CHANNELS = [devto, bluesky];
 
 function parseArgs(argv) {
   const out = { dryRun: false, slug: null, channels: null };

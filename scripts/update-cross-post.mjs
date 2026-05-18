@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 // Re-publish the current source markdown to existing cross-posts.
 // Use this when an already-cross-posted article gets a substantive edit
-// that needs to propagate to dev.to, Hashnode, etc. The companion
-// cross-post script is intentionally skip-if-exists, so edits do not
-// flow through it.
+// that needs to propagate to dev.to. The companion cross-post script is
+// intentionally skip-if-exists, so edits do not flow through it.
 //
 // Usage:
 //   node scripts/update-cross-post.mjs --slug=foo
@@ -12,14 +11,13 @@
 //   node scripts/update-cross-post.mjs --slug=foo --channels=devto
 //
 // Channels are auto-discovered. Only channels that export an `update`
-// function are eligible (Bluesky is excluded — editing a feed item in
+// function are eligible (Bluesky is excluded - editing a feed item in
 // place is rude / unsupported).
 
 import * as devto from './channels/devto.mjs';
-import * as hashnode from './channels/hashnode.mjs';
 import { loadArticle, resolvePosts } from './lib/post-source.mjs';
 
-const ALL_CHANNELS = [devto, hashnode];
+const ALL_CHANNELS = [devto];
 
 function parseArgs(argv) {
   const out = { slugs: [], dryRun: false, channels: null };
@@ -86,7 +84,7 @@ export async function processArticle(article, channels, dryRun) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.slugs.length === 0) {
-    console.error('Usage: node scripts/update-cross-post.mjs --slug=<slug> [--slug=<slug>...] [--channels=devto,hashnode] [--dry-run]');
+    console.error('Usage: node scripts/update-cross-post.mjs --slug=<slug> [--slug=<slug>...] [--channels=devto] [--dry-run]');
     process.exit(1);
   }
 
