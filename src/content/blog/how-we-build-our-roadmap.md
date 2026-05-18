@@ -134,4 +134,4 @@ If you have ideas, constraints, or feedback that should inform our next decision
 
 ---
 
-*Barbacane is open source (AGPLv3) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). Check the [documentation](https://docs.barbacane.dev/) for the full CLI reference and getting started guide.*
+*Barbacane is open source (AGPLv3) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). For a snapshot of where this roadmap is going for platform teams, see [the platform page](/platform/). Check the [documentation](https://docs.barbacane.dev/) for the full CLI reference and getting started guide.*

@@ -155,4 +155,4 @@ Conformity requirements are ultimately about demonstrating that your controls wo
 
 ---
 
-*Barbacane is open source (AGPLv3) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). Questions about compliance use cases? Reach us at [contact@barbacane.dev](mailto:contact@barbacane.dev).*
+*Barbacane is open source (AGPLv3) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). These controls are part of [Barbacane's platform-team story](/platform/). Questions about compliance use cases? Reach us at [contact@barbacane.dev](mailto:contact@barbacane.dev).*

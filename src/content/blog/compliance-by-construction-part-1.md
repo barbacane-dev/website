@@ -170,4 +170,4 @@ We'll cover all of that in [Part 2: the compliance controls](/blog/compliance-by
 
 ---
 
-*Barbacane is open source (AGPLv3) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). Questions about compliance use cases? Reach us at [contact@barbacane.dev](mailto:contact@barbacane.dev).*
+*Barbacane is open source (AGPLv3) and available at [github.com/barbacane-dev/barbacane](https://github.com/barbacane-dev/barbacane). These compliance mechanisms are part of the broader [platform-team story](/platform/). Questions about compliance use cases? Reach us at [contact@barbacane.dev](mailto:contact@barbacane.dev).*
