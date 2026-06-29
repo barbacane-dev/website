@@ -27,7 +27,7 @@ But memory safety is the easy 30 percent. It's the part the compiler hands you. 
 - A compiled artifact must be the artifact you signed, not one an attacker swapped on a registry. `Vec<u8>` is `Vec<u8>` whether it's trustworthy or not.
 - The admin API must require a credential. Rust will let you serve an unauthenticated `DELETE /projects/{id}` with perfect memory safety.
 
-Every one of these is a policy that lives in *your* code, not the language. And policies rot. Someone writes the capability manifest format, documents it beautifully in an ADR, ships the parser, and then... never wires the enforcement in. The manifest becomes documentation. The system keeps working, because nothing depends on the boundary being real until someone hostile shows up.
+Every one of these is a policy that lives in *your* code, not the language, and policies rot. Someone writes the capability manifest format, documents it in an ADR, ships the parser, and never wires the enforcement in. The manifest becomes documentation. The system keeps working, because nothing depends on the boundary being real until someone hostile shows up.
 
 When we reviewed our own gateway, that exact shape appeared more than once. A capability system whose validation function was written, tested, exported, and never called. An artifact format with per-plugin checksums that the loader never recomputed. The fix in each case was small. The interesting question was: **how do you make sure it stays fixed, and how do you catch the next one before a reviewer does?**
 
@@ -68,9 +68,9 @@ It helps to see where the harness sits. Defense in depth here is three architect
                       Safe execution
 ```
 
-Layers 1 and 2 you mostly *get*: the compiler enforces the first, and `wasmtime` enforces the second once you configure it. Layer 3 is the one you have to *build*, and it's the subject of the rest of this post. It combines a few techniques, none of them exotic. The discipline is in combining them under one rule: **write the test to assert the secure behavior, not the current behavior.**
+Layers 1 and 2 you mostly *get*: the compiler enforces the first, `wasmtime` the second once configured. Layer 3 you have to *build*, and it's the rest of this post. It combines a few techniques under one rule: **write the test to assert the secure behavior, not the current behavior.**
 
-That rule is the whole game. If you write a test that passes against today's code, you've documented today's code. If you write a test that asserts what *should* be true, and it fails, you've found a gap, and the day it goes green is the day the gap closed. Red-to-green becomes a forcing function instead of a chore.
+That rule is the whole game. A test that passes against today's code just documents today's code. A test that asserts what *should* be true and fails has found a gap, and the day it goes green is the day the gap closed. Red-to-green becomes a forcing function, not a chore.
 
 ---
 
@@ -111,7 +111,7 @@ async fn plugin_egress_blocks_metadata() {
 
 These read like a pentest written down. Auth bypass, SSRF, slowloris, oversized and chunked bodies, artifact tampering, capability escape, JWT forgery, spoofed `X-Forwarded-For`. Each category gets a module. Each test asserts the hardened outcome.
 
-The payoff is twofold. First, the obvious one: regression locking. Once a boundary is real, it can never silently become unreal again, because the build goes red. Second, the less obvious one: these tests *document the threat model in executable form*. A new contributor reading `tests/security/ssrf.rs` learns more about what the gateway promises than any prose I could write, and they can't accidentally let the promise lapse.
+The payoff is twofold: regression locking (a boundary that's real can't silently become unreal again, because the build goes red), and an executable threat model (a contributor reading `tests/security/ssrf.rs` learns what the gateway promises, and can't accidentally let the promise lapse).
 
 ---
 
@@ -141,15 +141,15 @@ fuzz_target!(|data: &[u8]| {
 
 The bar for a fuzz target is deliberately low and absolute: **it must never panic, abort, hang, or run out of memory, no matter the input.** That sounds modest until you remember that a panic on the request path is a denial of service, and a stack overflow from an unbounded `$ref` chain in a spec is a denial of service you'll only discover when someone submits one. Fuzzing is how you find the decompression bomb and the billion-laughs spec before they find you.
 
-A note on honesty here: fuzz targets that can't reach the real function are theater. When a guest-memory bounds check was buried inline in a 2,000-line file, the right move wasn't to fake a target around it, it was to extract the check into a `pub fn` with a clear contract so the fuzzer could hammer it directly. If you find yourself writing a fuzz target that doesn't actually exercise the dangerous code, that's a signal the dangerous code needs to be refactored into something testable.
+A note on honesty: a fuzz target that can't reach the real function is theater. When a guest-memory bounds check sat buried inline in a 2,000-line file, the fix wasn't to fake a target around it but to extract the check into a `pub fn` the fuzzer could hammer directly. A target that doesn't exercise the dangerous code is a signal the code needs refactoring, not a green check.
 
 ---
 
 ### Property tests for the invariants fuzzing can't reach
 
-Fuzzing is the right tool for raw bytes, where the input space is "any sequence of `u8`" and you're hunting for a crash. It's a poor tool for deep, structured state machines. Hand `cargo-fuzz` a pile of random bytes and ask it to discover a *valid* gateway configuration in which an auth rule is mis-applied, and it will spend almost all of its time being rejected by your JSON parser long before it reaches the logic you care about. Coverage-guided fuzzing can claw its way through that, but it's a slow, indirect way to test a property you can state directly.
+Fuzzing is the right tool for raw bytes: the input space is "any sequence of `u8`" and you're hunting for a crash. It's a poor tool for deep, structured logic. Ask `cargo-fuzz` to discover a *valid* gateway config in which an auth rule is mis-applied and it spends almost all its time bouncing off your JSON parser before it reaches the logic you care about. Coverage guidance can claw through that, but it's a slow, indirect way to test a property you can state directly.
 
-That's what property-based testing is for. With `proptest` (or `quickcheck`), you generate structurally *valid* inputs and assert an invariant holds across all of them. The generator understands your domain; the fuzzer doesn't. The two are complementary: fuzz the byte parsers, property-test the system invariants.
+That's what property-based testing is for. With `proptest` (or `quickcheck`) you generate structurally *valid* inputs and assert an invariant holds across all of them, because the generator understands your domain and the fuzzer doesn't. The two are complementary: fuzz the byte parsers, property-test the system invariants.
 
 The invariant worth testing here is the one a checklist can only assert in prose: *no matter what configuration we compile, an unauthenticated request to a route that declares a security scheme is never dispatched to its backend.*
 
@@ -204,7 +204,7 @@ With the real imports in hand, computing the minimal capability set per plugin b
 
 The general principle: when you secure a boundary in a system that's already shipping, your verification has to run against what the system *does*, not what you believe it does. Source code, comments, and your own mental model are all hypotheses. The artifact is the evidence.
 
-A forward-looking note: inspecting raw import sections is the right move *today*, because our plugins are core-wasm modules with a flat list of `barbacane`-namespaced imports. The WebAssembly ecosystem is standardizing exactly this kind of interface restriction with the [Component Model](https://component-model.bytecodealliance.org/) and WIT (Wasm Interface Type) files, where a component's imports and exports are declared in a typed `world` and the host can refuse to satisfy anything outside it. As that lands in production toolchains, "verify against ground truth" shifts from parsing import sections by hand to checking a component against its declared world, which is the same principle with a stronger type system behind it. Worth watching if you're designing a capability model now.
+A forward-looking note: parsing raw import sections is the right move *today*, because our plugins are core-wasm modules with a flat list of `barbacane`-namespaced imports. The WebAssembly [Component Model](https://component-model.bytecodealliance.org/) and WIT (Wasm Interface Type) files are standardizing exactly this: a component declares its imports and exports in a typed `world`, and the host refuses anything outside it. As that lands in production toolchains, "verify against ground truth" becomes "check a component against its declared world", the same principle with a stronger type system behind it.
 
 ---
 
@@ -231,29 +231,25 @@ async fn tampered_artifact_is_refused_cleanly() {
 }
 ```
 
-`assert_ne!(status, 200)` would pass even if the gateway paniced. `assert_eq!(status, 401)` (or matching a typed `SignatureInvalid` error) is what proves the boundary fails *closed and clean*. Test the exact failure, not the absence of success.
+`assert_ne!(status, 200)` would pass even if the gateway paniced; a typed `SignatureInvalid` (or a `401`) proves it fails *closed and clean*. Test the exact failure, not the absence of success.
 
 ---
 
 ### Keeping the harness fast enough that nobody routes around it
 
-A harness only protects you if it runs, and the fastest way to kill one is to make it slow or flaky. If the security suite turns a five-minute build into twenty-five, developers will start merging around it, and a control nobody runs is a control you don't have. So the cadence of each technique has to match its cost.
+A harness only protects you if it runs, and the fastest way to kill one is to make it slow or flaky. Turn a five-minute build into twenty-five and developers start merging around it; a control nobody runs is a control you don't have. So match each technique's cadence to its cost.
 
-The cheap, deterministic checks gate every commit. Unit and boundary tests run as `cargo test --workspace --lib --bins`, finishing in seconds, on every push. The heavier adversarial suite, which boots the gateway binary and a real Postgres for the control plane, runs as its own dedicated CI job on each pull request, isolated so it never slows the fast feedback loop.
+The cheap, deterministic checks gate every commit: unit and boundary tests (`cargo test --workspace --lib --bins`) finish in seconds on every push. The heavier adversarial suite, which boots the gateway binary and a real Postgres for the control plane, runs as its own CI job per pull request, isolated so it never slows the fast loop. It stays unflaky by never touching a live network: upstreams are `wiremock` servers spun up inside the test, and the gateway listens on loopback with the SSRF guard configured per-client (see below) rather than from global state, so tests are deterministic instead of racing each other. Hermetic tests are the only kind worth gating a merge on.
 
-The thing that keeps that heavier suite from being flaky is that it never touches a live network. Upstreams are `wiremock` servers spun up inside the test, so responses are deterministic and there's no external endpoint to be slow or down. The gateway's own listener is on loopback, and because the SSRF guard is configured per-client (see below) rather than from global state, loopback tests are deterministic instead of racing each other. Hermetic tests are the only kind worth gating a merge on.
-
-Fuzzing is deliberately *not* a per-commit gate. `cargo-fuzz` needs the nightly toolchain, and a fuzzing run doesn't "pass", it runs until you stop it. So the fuzzers run out of band: as a scheduled soak job and locally before releases. The important part is the feedback loop: every crash a fuzzer finds becomes a committed regression test (and a seed in the corpus), so the open-ended, expensive tier keeps feeding cheap, deterministic checks back into the tier that gates every commit. Match the technique to the cadence, and let the slow tier harden the fast one.
+Fuzzing is deliberately *not* a per-commit gate: `cargo-fuzz` needs nightly, and a run doesn't "pass", it runs until you stop it. So the fuzzers run out of band, as a scheduled soak job and before releases, and every crash they find becomes a committed regression test (plus a corpus seed). The expensive, open-ended tier keeps feeding cheap deterministic checks back into the tier that gates every commit. Match the technique to the cadence, and let the slow tier harden the fast one.
 
 ---
 
 ### Testability is a security property
 
-One last lesson, because it surprised me. The first version of our SSRF guard read its allow-flag from a global, cached on first use. It worked, and it was almost impossible to test, because one test setting the flag would poison every other test in the process. The race made the suite flaky, and a flaky security test is one you'll eventually delete.
+One last lesson, because it surprised me. Our SSRF guard first read its allow-flag from a global, cached on first use. It worked, and it was almost untestable: one test setting the flag poisoned every other test in the process, the suite went flaky, and a flaky security test is one you'll eventually delete. Moving the flag onto the client's own config fixed it. Each test could build exactly the client it needed, the flakiness vanished, and the code got more honest, since the SSRF policy now visibly belongs to the thing making the request.
 
-The fix was to move the flag onto the client's own config instead of a global. Suddenly each test could construct exactly the client it needed, the flakiness vanished, and as a bonus the code got more honest: the SSRF policy now visibly belongs to the thing making the request. Global mutable state isn't just an architecture smell; in security code it's the thing that makes your guarantees untestable, and an untestable guarantee is a guarantee you can't trust.
-
-If a security control is hard to test, that's not a testing problem to route around. It's a design problem telling you the control is in the wrong place.
+If a security control is hard to test, that's not a testing problem to route around. It's a design problem telling you the control is in the wrong place. Global mutable state in security code is exactly that: it makes your guarantees untestable, and an untestable guarantee is one you can't trust.
 
 ---
 
@@ -261,7 +257,7 @@ If a security control is hard to test, that's not a testing problem to route aro
 
 There's no clever trick here. The harness is adversarial integration tests that attack the running system, property tests for the invariants those examples can't cover, fuzz targets on every untrusted-input byte boundary, and verification that runs against compiled reality instead of source. The cheap deterministic checks gate every commit; the expensive open-ended ones run on a schedule and feed their findings back. The defaults fail closed, the closed path is tested for a clean refusal, and the controls live somewhere testable.
 
-What makes it work isn't any one technique. It's the shift from treating security as a property you assert to treating it as a property you *continuously prove*, in CI, on every commit, against what the machine actually runs. Designing a boundary is the easy part and the part everyone does. Enforcing it, and proving it stays enforced, is the work. In complex software it's most of the work, and Rust, for all its gifts, won't do it for you.
+What makes it work isn't any one technique. It's the shift from treating security as a property you *assert* to one you *continuously prove*, in CI, against what the machine actually runs. Designing a boundary is the easy part that everyone does. Enforcing it, and proving it stays enforced, is the work, and in complex software it's most of the work. Rust, for all its gifts, won't do it for you.
 
 ---
 
