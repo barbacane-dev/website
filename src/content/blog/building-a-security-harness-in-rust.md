@@ -39,31 +39,71 @@ You build a harness.
 
 A security checklist is a document. A security harness is code that runs in CI and fails the build when a boundary regresses. The difference matters because checklists describe intentions and harnesses describe reality, and in security only reality counts.
 
-Ours has three layers. None of them is exotic. The discipline is in combining them and in one rule that ties them together: **write the test to assert the secure behavior, not the current behavior.**
+It helps to see where the harness sits. Defense in depth here is three architectural layers, and only the third is something you build and run yourself:
+
+```text
+   Untrusted input: network bytes · .bca artifacts · plugin WASM
+                              │
+                              ▼
+  ┌─────────────────────────────────────────────────────────┐
+  │  LAYER 1  Memory & type safety                           │ ← Rust compiler
+  └─────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+  ┌─────────────────────────────────────────────────────────┐
+  │  LAYER 2  Runtime isolation                              │ ← wasmtime sandbox,
+  │           per-plugin linker · fuel + epoch · memory caps │   capability gating
+  └─────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+  ┌─────────────────────────────────────────────────────────┐
+  │  LAYER 3  The security harness (your CI pipeline)        │
+  │   • adversarial integration tests   (wiremock)          │
+  │   • property-based invariants        (proptest)         │
+  │   • byte-boundary fuzzing            (cargo-fuzz)       │
+  │   • static WASM import validation    (wasmparser)       │
+  └─────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+                      Safe execution
+```
+
+Layers 1 and 2 you mostly *get*: the compiler enforces the first, and `wasmtime` enforces the second once you configure it. Layer 3 is the one you have to *build*, and it's the subject of the rest of this post. It combines a few techniques, none of them exotic. The discipline is in combining them under one rule: **write the test to assert the secure behavior, not the current behavior.**
 
 That rule is the whole game. If you write a test that passes against today's code, you've documented today's code. If you write a test that asserts what *should* be true, and it fails, you've found a gap, and the day it goes green is the day the gap closed. Red-to-green becomes a forcing function instead of a chore.
 
 ---
 
-### Layer 1: boot the real thing and attack it
+### Boot the real thing and attack it
 
-Unit tests are great for logic and useless for boundaries, because boundaries live in the seams between components. So the first layer is an adversarial integration suite that starts the actual gateway and control plane and then behaves like an attacker.
+Unit tests are great for logic and useless for boundaries, because boundaries live in the seams between components. So the first technique is an adversarial integration suite that starts the actual gateway and control plane and then behaves like an attacker.
 
 ```rust
+use wiremock::{MockServer, Mock, ResponseTemplate};
+use wiremock::matchers::method;
+
 // Every mutating control-plane route must reject an unauthenticated caller.
 #[tokio::test]
 async fn control_plane_requires_auth() {
-    let cp = spawn_control_plane().await;
-    for (method, path) in MUTATING_ROUTES {
-        let status = cp.request_no_token(method, path).await;
-        assert_eq!(status, 401, "{method} {path} must require auth");
+    let cp = spawn_control_plane().await; // boots the real axum router
+    for (verb, path) in MUTATING_ROUTES {
+        let status = cp.request_no_token(verb, path).await;
+        assert_eq!(status, 401, "{verb} {path} must require auth, got {status}");
     }
 }
 
-// A plugin must not be able to reach the cloud metadata endpoint.
+// A plugin must not be able to reach the cloud metadata endpoint, even when a
+// real upstream is standing by. The upstream is a wiremock server, so the test
+// is hermetic: no live network, no flakiness.
 #[tokio::test]
 async fn plugin_egress_blocks_metadata() {
-    let gw = spawn_gateway_with_dispatcher("http://169.254.169.254/").await;
+    let upstream = MockServer::start().await;
+    Mock::given(method("GET"))
+        .respond_with(ResponseTemplate::new(200))
+        .mount(&upstream)
+        .await;
+
+    let gw = spawn_gateway_dispatching_to("http://169.254.169.254/").await;
     let resp = gw.get("/proxy").await;
     assert_ne!(resp.status, 200, "SSRF to metadata must be blocked");
 }
@@ -75,7 +115,7 @@ The payoff is twofold. First, the obvious one: regression locking. Once a bounda
 
 ---
 
-### Layer 2: fuzz the trust boundaries
+### Fuzz the byte boundaries
 
 Integration tests check the boundaries you thought of. Fuzzing finds the ones you didn't, and it's tailor-made for the highest-risk surfaces in a system like this: the parsers and loaders that turn untrusted bytes into structured data.
 
@@ -105,7 +145,37 @@ A note on honesty here: fuzz targets that can't reach the real function are thea
 
 ---
 
-### Layer 3: verify against ground truth, not your assumptions
+### Property tests for the invariants fuzzing can't reach
+
+Fuzzing is the right tool for raw bytes, where the input space is "any sequence of `u8`" and you're hunting for a crash. It's a poor tool for deep, structured state machines. Hand `cargo-fuzz` a pile of random bytes and ask it to discover a *valid* gateway configuration in which an auth rule is mis-applied, and it will spend almost all of its time being rejected by your JSON parser long before it reaches the logic you care about. Coverage-guided fuzzing can claw its way through that, but it's a slow, indirect way to test a property you can state directly.
+
+That's what property-based testing is for. With `proptest` (or `quickcheck`), you generate structurally *valid* inputs and assert an invariant holds across all of them. The generator understands your domain; the fuzzer doesn't. The two are complementary: fuzz the byte parsers, property-test the system invariants.
+
+The invariant worth testing here is the one a checklist can only assert in prose: *no matter what configuration we compile, an unauthenticated request to a route that declares a security scheme is never dispatched to its backend.*
+
+```rust
+proptest! {
+    #[test]
+    fn protected_routes_never_dispatch_unauthenticated(spec in arb_api_spec()) {
+        let artifact = compile(&spec);
+        let gw = Gateway::load(&artifact);
+
+        for route in spec.routes_with_security_scheme() {
+            let resp = gw.request_without_credentials(&route);
+            // Reaching the backend unauthenticated is the failure we forbid,
+            // for every spec proptest can dream up, not just the ones we wrote.
+            prop_assert!(!resp.reached_backend());
+            prop_assert_eq!(resp.status, 401);
+        }
+    }
+}
+```
+
+`arb_api_spec()` is a strategy that builds arbitrary-but-valid specs: random routes, methods, middleware orders, and security schemes. When this fails, `proptest` shrinks the input to the *minimal* spec that breaks the invariant, which usually hands you the bug on a plate. A hand-written example test checks the cases you imagined; a property test checks the case you didn't.
+
+---
+
+### Verify against ground truth, not your assumptions
 
 This is the lesson I'd most want someone else to take from our hardening pass, because it nearly bit us.
 
@@ -113,9 +183,11 @@ We have a capability model: each plugin declares the host functions it needs in 
 
 The instinct is to fix the manifests by reading the source. **Don't trust the source.** I started by grepping each plugin for its `extern` host-function declarations, and it lied to me. One plugin declared its HTTP imports through `#[link_name]` aliases that a naive grep missed entirely; another imported a time function the host didn't even provide, dead-code-eliminated away at build time so it never mattered. Source is what the author wrote. It is not what the machine runs.
 
-So I derived the truth from the artifact instead. Build every plugin to wasm, then read the actual import section of each compiled module:
+So I derived the truth from the artifact instead. Build every plugin to wasm, then read the actual import section of each compiled module with `wasmparser` (the `walrus` crate works too if you want a higher-level IR):
 
 ```rust
+use wasmparser::{Parser, Payload};
+
 for payload in Parser::new(0).parse_all(&wasm) {
     if let Payload::ImportSection(reader) = payload? {
         for import in reader {
@@ -132,6 +204,8 @@ With the real imports in hand, computing the minimal capability set per plugin b
 
 The general principle: when you secure a boundary in a system that's already shipping, your verification has to run against what the system *does*, not what you believe it does. Source code, comments, and your own mental model are all hypotheses. The artifact is the evidence.
 
+A forward-looking note: inspecting raw import sections is the right move *today*, because our plugins are core-wasm modules with a flat list of `barbacane`-namespaced imports. The WebAssembly ecosystem is standardizing exactly this kind of interface restriction with the [Component Model](https://component-model.bytecodealliance.org/) and WIT (Wasm Interface Type) files, where a component's imports and exports are declared in a typed `world` and the host can refuse to satisfy anything outside it. As that lands in production toolchains, "verify against ground truth" shifts from parsing import sections by hand to checking a component against its declared world, which is the same principle with a stronger type system behind it. Worth watching if you're designing a capability model now.
+
 ---
 
 ### Make the default fail closed, then test the closed path
@@ -141,6 +215,35 @@ A harness checks behavior, but it can only check the behavior you ship. The othe
 Concretely, that meant a set of deliberately breaking changes: the control plane now refuses to start without an admin token rather than serving an open API; `file://` secret references must be confined to a configured directory rather than reading any path on disk; plugin egress to internal addresses is denied unless explicitly allowed; an MCP session is required rather than optional. Each one can be loosened by an operator who knows what they're doing. None of them is loose by accident.
 
 Fail-closed defaults are only trustworthy if you test the closed path, which is easy to forget. It's natural to test that a valid token works. It's the test that *no* token returns 401, that a `..` traversal is rejected, that the metadata IP is blocked, that catches the regression. The negative test is the one that matters.
+
+And "fail closed" has to mean a *clean* refusal, not a crash. A panic or a 500 on the adversarial path is its own vulnerability: a leaked stack trace, a downed worker, an attacker-triggered restart loop. So the negative test asserts the *specific* refusal, not merely "not success":
+
+```rust
+#[tokio::test]
+async fn tampered_artifact_is_refused_cleanly() {
+    let mut artifact = compile_signed(&spec, &signing_key);
+    flip_one_byte_in_a_plugin(&mut artifact); // attacker swaps plugin WASM
+
+    let result = Gateway::load(&artifact);
+
+    // The point: a *defined* error, not a panic and not a 500.
+    assert!(matches!(result, Err(LoadError::SignatureInvalid)));
+}
+```
+
+`assert_ne!(status, 200)` would pass even if the gateway paniced. `assert_eq!(status, 401)` (or matching a typed `SignatureInvalid` error) is what proves the boundary fails *closed and clean*. Test the exact failure, not the absence of success.
+
+---
+
+### Keeping the harness fast enough that nobody routes around it
+
+A harness only protects you if it runs, and the fastest way to kill one is to make it slow or flaky. If the security suite turns a five-minute build into twenty-five, developers will start merging around it, and a control nobody runs is a control you don't have. So the cadence of each technique has to match its cost.
+
+The cheap, deterministic checks gate every commit. Unit and boundary tests run as `cargo test --workspace --lib --bins`, finishing in seconds, on every push. The heavier adversarial suite, which boots the gateway binary and a real Postgres for the control plane, runs as its own dedicated CI job on each pull request, isolated so it never slows the fast feedback loop.
+
+The thing that keeps that heavier suite from being flaky is that it never touches a live network. Upstreams are `wiremock` servers spun up inside the test, so responses are deterministic and there's no external endpoint to be slow or down. The gateway's own listener is on loopback, and because the SSRF guard is configured per-client (see below) rather than from global state, loopback tests are deterministic instead of racing each other. Hermetic tests are the only kind worth gating a merge on.
+
+Fuzzing is deliberately *not* a per-commit gate. `cargo-fuzz` needs the nightly toolchain, and a fuzzing run doesn't "pass", it runs until you stop it. So the fuzzers run out of band: as a scheduled soak job and locally before releases. The important part is the feedback loop: every crash a fuzzer finds becomes a committed regression test (and a seed in the corpus), so the open-ended, expensive tier keeps feeding cheap, deterministic checks back into the tier that gates every commit. Match the technique to the cadence, and let the slow tier harden the fast one.
 
 ---
 
@@ -156,7 +259,7 @@ If a security control is hard to test, that's not a testing problem to route aro
 
 ### The boring conclusion
 
-There's no clever trick here. The harness is integration tests that attack the running system, fuzz targets on every untrusted-input boundary, and verification that runs against compiled reality instead of source. The defaults fail closed and the closed path is tested. The controls live somewhere testable.
+There's no clever trick here. The harness is adversarial integration tests that attack the running system, property tests for the invariants those examples can't cover, fuzz targets on every untrusted-input byte boundary, and verification that runs against compiled reality instead of source. The cheap deterministic checks gate every commit; the expensive open-ended ones run on a schedule and feed their findings back. The defaults fail closed, the closed path is tested for a clean refusal, and the controls live somewhere testable.
 
 What makes it work isn't any one technique. It's the shift from treating security as a property you assert to treating it as a property you *continuously prove*, in CI, on every commit, against what the machine actually runs. Designing a boundary is the easy part and the part everyone does. Enforcing it, and proving it stays enforced, is the work. In complex software it's most of the work, and Rust, for all its gifts, won't do it for you.
 
