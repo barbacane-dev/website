@@ -4,6 +4,7 @@ description: "The Token Manifesto argues for discipline over verbosity in the LL
 publishDate: 2026-07-17
 author: "Nicolas Dreno"
 tags: ["barbacane", "spec-driven", "ai-gateway", "ways-of-working", "opinion"]
+draft: false
 ---
 
 *A manifesto is a set of good intentions. Good intentions drift. So we stopped writing them down and started compiling them.*
