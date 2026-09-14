@@ -34,6 +34,7 @@ const postUrl = `https://barbacane.dev/blog/${post.id}/`;
   type="article"
   article={{
     publishedTime: post.data.publishDate.toISOString(),
+    modifiedTime: post.data.updatedDate?.toISOString(),
     author: post.data.author,
     tags: post.data.tags,
   }}
@@ -46,6 +47,14 @@ const postUrl = `https://barbacane.dev/blog/${post.id}/`;
           <time datetime={post.data.publishDate.toISOString()}>
             {formatDate(post.data.publishDate)}
           </time>
+          {post.data.updatedDate && (
+            <>
+              <span>&middot;</span>
+              <time datetime={post.data.updatedDate.toISOString()}>
+                Updated {formatDate(post.data.updatedDate)}
+              </time>
+            </>
+          )}
           <span>&middot;</span>
           <span>{readingTime} min read</span>
         </div>

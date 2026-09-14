@@ -1,7 +1,8 @@
 ---
-title: "Barbacane vs Portkey and LiteLLM: picking an AI gateway in 2026"
-description: "Portkey, LiteLLM, and Barbacane all ship an outbound AI gateway. Where they diverge is what else the gateway does: spec-first routing, MCP for the inbound direction, and composition with the rest of your API governance. An honest comparison for teams picking one."
+title: "LiteLLM vs Portkey vs Barbacane: picking an AI gateway in 2026"
+description: "LiteLLM vs Portkey is the usual first comparison, but the real question is what the gateway does once it handles more than the LLM path. A head-to-head on LiteLLM, Portkey, and Barbacane: provider coverage, spec-first routing, MCP for the inbound direction, and composition with the rest of your API governance."
 publishDate: 2026-05-18
+updatedDate: 2026-09-14
 author: "Nicolas Dreno"
 tags: ["ai-gateway", "mcp-gateway", "portkey", "litellm", "comparison", "model-context-protocol", "ai-governance"]
 draft: false
@@ -26,6 +27,18 @@ All three products sit between your application and one or more LLM providers. A
 - **Prompt and response guardrails** (scope varies by product)
 
 If outbound LLM proxy is all you need, all three will work. The differences show up in what else the gateway does, how it is configured, and what happens when your requirements grow beyond the LLM path.
+
+---
+
+### LiteLLM vs Portkey, head to head
+
+Most evaluations start with LiteLLM vs Portkey, so here is the short version before we bring in the third option.
+
+**LiteLLM** is open-source (MIT), Python-native, and has the broadest provider coverage of the three. It runs as a library inside your app or as a standalone proxy server, and it fits naturally next to Python ML tooling. You own the deployment and the upgrades. Pick it when you want maximum provider breadth, an OSS foundation you control, and a Python runtime.
+
+**Portkey** is a commercial product, available as managed SaaS or self-hosted, focused on the LLM path with a polished operator experience: a configuration UI, a playground, a prompt library, and an observability dashboard built for LLM traffic. Pick it when you want an AI gateway as a product with vendor support and managed upgrades, and AI is the primary thing your team is buying for.
+
+The honest summary: **LiteLLM optimizes for open-source breadth and control; Portkey optimizes for a managed product and operator UX.** Both treat the AI gateway as a self-contained box. That is the right shape when LLM traffic is the only traffic the gateway handles, and it is the assumption worth questioning if you already run an API gateway. That is where the third option comes in.
 
 ---
 
