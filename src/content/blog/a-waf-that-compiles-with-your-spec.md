@@ -4,6 +4,7 @@ description: "Most WAFs parse their rules at runtime and silently drop the ones 
 publishDate: 2026-09-14
 author: "Nicolas Dreno"
 tags: ["barbacane", "api-gateway", "waf", "security", "owasp-crs", "modsecurity", "libinjection"]
+draft: false
 ---
 
 *A rule that silently never fires is worse than no rule. It reads like coverage and behaves like a gap.*
