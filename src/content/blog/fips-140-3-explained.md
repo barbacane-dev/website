@@ -1,7 +1,7 @@
 ---
 title: "FIPS 140-3, explained: what it validates and how to actually get it"
 description: "FIPS 140-3 shows up as a procurement gate for government, defense, finance, and healthcare, and it is widely misunderstood. What FIPS 140-3 validates (a cryptographic module, not your whole application), how it differs from 140-2, whether it is quantum-safe, and how Barbacane provides it without an OpenSSL FIPS build."
-publishDate: 2026-09-16
+publishDate: 2026-09-07
 author: "Nicolas Dreno"
 tags: ["barbacane", "api-gateway", "fips", "fips-140-3", "compliance", "security", "tls", "rustls"]
 ---
