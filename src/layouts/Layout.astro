@@ -16,7 +16,7 @@ interface Props {
 
 const {
   title,
-  description = "Barbacane is the open-source AI gateway, both directions. Route LLM calls through OpenAI, Anthropic, or Ollama outbound. Expose your APIs to AI agents as typed MCP tools inbound. Rust-native, spec-first, composed from dispatchers and middlewares.",
+  description = "Barbacane is the open-source, spec-driven API gateway. Compile your OpenAPI and AsyncAPI into a signed artifact and enforce it: routing, validation, auth, rate limits, a native WAF, and observability, all declared in the spec. The same middleware chain routes your LLM calls and exposes your APIs to agents as MCP tools. Rust-native, WASM plugins, AGPLv3.",
   type = 'website',
   article,
   ogImage: customOgImage,
@@ -146,8 +146,8 @@ const structuredDataBlocks = customStructuredData
 
           <!-- Desktop navigation -->
           <div class="hidden md:flex items-center gap-8">
-            <a href="/ai/" class="text-foreground-muted hover:text-primary transition-colors">AI teams</a>
             <a href="/platform/" class="text-foreground-muted hover:text-primary transition-colors">Platform teams</a>
+            <a href="/ai/" class="text-foreground-muted hover:text-primary transition-colors">AI teams</a>
             <a href="https://docs.barbacane.dev" class="text-foreground-muted hover:text-primary transition-colors">Docs</a>
             <a href="/blog/" class="text-foreground-muted hover:text-primary transition-colors">Blog</a>
             <div class="relative group">
@@ -191,8 +191,8 @@ const structuredDataBlocks = customStructuredData
       <!-- Mobile menu -->
       <div id="mobile-menu" class="hidden md:hidden border-t border-themed">
         <div class="container-custom py-4 space-y-4">
-          <a href="/ai/" class="block text-foreground-muted hover:text-primary transition-colors py-2">AI teams</a>
           <a href="/platform/" class="block text-foreground-muted hover:text-primary transition-colors py-2">Platform teams</a>
+          <a href="/ai/" class="block text-foreground-muted hover:text-primary transition-colors py-2">AI teams</a>
           <a href="https://docs.barbacane.dev" class="block text-foreground-muted hover:text-primary transition-colors py-2">Docs</a>
           <a href="/blog/" class="block text-foreground-muted hover:text-primary transition-colors py-2">Blog</a>
           <a href="/pricing/" class="block text-foreground-muted hover:text-primary transition-colors py-2">Licensing</a>
@@ -249,16 +249,17 @@ const structuredDataBlocks = customStructuredData
               <span class="font-bold text-xl text-gradient">Barbacane</span>
             </a>
             <p class="text-foreground-muted max-w-md">
-              The open-source AI gateway, both directions. Route LLM calls outbound,
-              expose your APIs to agents inbound. Rust-native, spec-first, AGPLv3.
+              The open-source, spec-driven API gateway. Compile your OpenAPI and
+              AsyncAPI into a signed artifact and enforce it, WAF and AI included.
+              Rust-native, spec-first, AGPLv3.
             </p>
           </div>
 
           <div>
             <h4 class="font-semibold mb-4">Product</h4>
             <ul class="space-y-2 text-foreground-muted">
-              <li><a href="/ai/" class="hover:text-primary transition-colors">AI teams</a></li>
               <li><a href="/platform/" class="hover:text-primary transition-colors">Platform teams</a></li>
+              <li><a href="/ai/" class="hover:text-primary transition-colors">AI teams</a></li>
               <li><a href="/blog/" class="hover:text-primary transition-colors">Blog</a></li>
               <li><a href="https://docs.barbacane.dev" class="hover:text-primary transition-colors">Documentation</a></li>
               <li><a href="https://github.com/barbacane-dev/barbacane" class="hover:text-primary transition-colors">GitHub</a></li>

@@ -62,7 +62,7 @@ const aiProxyYaml = `paths:
 const codeThemes = { light: 'github-light', dark: 'github-dark' };
 ---
 
-<Layout title="Barbacane - Open-source AI gateway for LLMs and MCP">
+<Layout title="Barbacane - The spec-driven API gateway">
   <!-- Hero Section -->
   <section class="section relative overflow-hidden">
     <div class="absolute inset-0 hero-gradient"></div>
@@ -70,24 +70,25 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
       <div class="max-w-4xl mx-auto text-center">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background-light border border-themed mb-8">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          <span class="text-sm text-foreground-muted">Open source &middot; AI gateway &middot; AGPLv3</span>
+          <span class="text-sm text-foreground-muted">Open source &middot; Spec-driven API gateway &middot; AGPLv3</span>
         </div>
 
         <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
-          One AI gateway,
-          <span class="text-gradient">both directions</span>
+          One spec.
+          <span class="text-gradient">Zero drift.</span>
         </h1>
 
         <p class="text-lg sm:text-xl text-foreground-muted max-w-3xl mx-auto mb-10">
-          Barbacane handles AI traffic on the way out and on the way in. Route your
-          application's LLM calls through OpenAI, Anthropic, or Ollama with provider
-          fallback and policy routing. Expose your existing APIs to AI agents as typed
-          MCP tools. Same gateway, same middleware, same spec.
+          Barbacane compiles your OpenAPI and AsyncAPI into a signed artifact and
+          enforces it: routing, validation, authentication, rate limiting, a native
+          WAF, and observability, all declared in the spec you already write. The same
+          middleware chain routes your LLM calls and exposes your APIs to agents as
+          typed MCP tools.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="/ai/" class="btn-primary text-lg px-8 py-4">
-            Explore the AI gateway
+          <a href="https://docs.barbacane.dev/guide/getting-started.html" class="btn-primary text-lg px-8 py-4">
+            Get started
             <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
             </svg>
@@ -98,6 +99,147 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
             </svg>
             View on GitHub
           </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem Section -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12">
+          The <span class="text-accent">problem</span> with traditional API gateways
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="card border-error/20">
+            <div class="w-12 h-12 rounded-lg bg-error-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Two sources of truth</h3>
+            <p class="text-foreground-muted">
+              Your OpenAPI spec defines your API, but your gateway has its own configuration.
+              They inevitably diverge, causing bugs and security issues.
+            </p>
+          </div>
+
+          <div class="card border-error/20">
+            <div class="w-12 h-12 rounded-lg bg-error-subtle flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Wasted time reconciling</h3>
+            <p class="text-foreground-muted">
+              Teams spend hours syncing gateway config with API specs, debugging mismatches,
+              and fixing inconsistencies that shouldn't exist.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solution Section -->
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          The <span class="text-gradient">Barbacane</span> approach
+        </h2>
+        <p class="text-xl text-foreground-muted">
+          One spec. Zero configuration drift. Automatic enforcement.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="card text-center">
+          <div class="w-16 h-16 rounded-2xl bg-primary-subtle flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl">1</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Write your API spec</h3>
+          <p class="text-foreground-muted">
+            Use OpenAPI or AsyncAPI with <code class="text-primary">x-barbacane-*</code> extensions
+            for auth, rate limiting, and routing.
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div class="w-16 h-16 rounded-2xl bg-secondary-subtle flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl">2</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Compile to an artifact</h3>
+          <p class="text-foreground-muted">
+            Run <code class="text-secondary">barbacane compile</code> to generate an optimized
+            binary artifact. Validation happens at compile time.
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div class="w-16 h-16 rounded-2xl bg-accent-subtle flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl">3</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Deploy and run</h3>
+          <p class="text-foreground-muted">
+            Deploy the artifact to your gateway. Routing, validation, auth &mdash; everything
+            works exactly as specified.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAF / Security Section -->
+  <section id="waf" class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            A <span class="text-gradient">WAF</span> that compiles with your spec
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
+            Run a ModSecurity / OWASP CRS compatible rule set as a native stage in the
+            pipeline. Rules are validated at compile time and sealed into the signed
+            artifact, so an unknown directive fails the build instead of silently never
+            firing.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">OWASP CRS, native</h3>
+            <p class="text-foreground-muted text-sm">
+              Stock Core Rule Set v4 compiles in full, with SQL injection and XSS
+              classifiers running on a pure-Rust libinjection port, differential-tested
+              against the C library.
+            </p>
+          </div>
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Request and response</h3>
+            <p class="text-foreground-muted text-sm">
+              Inspect inbound requests and outbound responses (CRS phases 3 to 5), so a
+              leaked credential or stack trace is caught on the way out, not just on the
+              way in.
+            </p>
+          </div>
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Sealed and signed</h3>
+            <p class="text-foreground-muted text-sm">
+              The rule set and its policy are folded into the artifact hash, so a signed
+              artifact cannot be switched from blocking to detection-only without breaking
+              the signature.
+            </p>
+          </div>
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-2">Audit log</h3>
+            <p class="text-foreground-muted text-sm">
+              A structured per-transaction audit record on its own log target: matched
+              rules, anomaly scores, and the verdict, ready for a SIEM.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -285,94 +427,6 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
     </div>
   </section>
 
-  <!-- Problem Section -->
-  <section class="section bg-background-light">
-    <div class="container-custom">
-      <div class="max-w-4xl mx-auto">
-        <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12">
-          The <span class="text-accent">problem</span> with traditional API gateways
-        </h2>
-
-        <div class="grid md:grid-cols-2 gap-8">
-          <div class="card border-error/20">
-            <div class="w-12 h-12 rounded-lg bg-error-subtle flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">Two sources of truth</h3>
-            <p class="text-foreground-muted">
-              Your OpenAPI spec defines your API, but your gateway has its own configuration.
-              They inevitably diverge, causing bugs and security issues.
-            </p>
-          </div>
-
-          <div class="card border-error/20">
-            <div class="w-12 h-12 rounded-lg bg-error-subtle flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">Wasted time reconciling</h3>
-            <p class="text-foreground-muted">
-              Teams spend hours syncing gateway config with API specs, debugging mismatches,
-              and fixing inconsistencies that shouldn't exist.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Solution Section -->
-  <section class="section">
-    <div class="container-custom">
-      <div class="max-w-4xl mx-auto text-center mb-16">
-        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-          The <span class="text-gradient">Barbacane</span> approach
-        </h2>
-        <p class="text-xl text-foreground-muted">
-          One spec. Zero configuration drift. Automatic enforcement.
-        </p>
-      </div>
-
-      <div class="grid lg:grid-cols-3 gap-6">
-        <div class="card text-center">
-          <div class="w-16 h-16 rounded-2xl bg-primary-subtle flex items-center justify-center mx-auto mb-6">
-            <span class="text-3xl">1</span>
-          </div>
-          <h3 class="text-xl font-semibold mb-3">Write your API spec</h3>
-          <p class="text-foreground-muted">
-            Use OpenAPI or AsyncAPI with <code class="text-primary">x-barbacane-*</code> extensions
-            for auth, rate limiting, and routing.
-          </p>
-        </div>
-
-        <div class="card text-center">
-          <div class="w-16 h-16 rounded-2xl bg-secondary-subtle flex items-center justify-center mx-auto mb-6">
-            <span class="text-3xl">2</span>
-          </div>
-          <h3 class="text-xl font-semibold mb-3">Compile to an artifact</h3>
-          <p class="text-foreground-muted">
-            Run <code class="text-secondary">barbacane compile</code> to generate an optimized
-            binary artifact. Validation happens at compile time.
-          </p>
-        </div>
-
-        <div class="card text-center">
-          <div class="w-16 h-16 rounded-2xl bg-accent-subtle flex items-center justify-center mx-auto mb-6">
-            <span class="text-3xl">3</span>
-          </div>
-          <h3 class="text-xl font-semibold mb-3">Deploy and run</h3>
-          <p class="text-foreground-muted">
-            Deploy the artifact to your gateway. Routing, validation, auth &mdash; everything
-            works exactly as specified.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Features Section -->
   <section id="features" class="section bg-background-light">
     <div class="container-custom">
@@ -423,6 +477,20 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
           <p class="text-foreground-muted">
             Five built-in auth plugins: JWT, OIDC, OAuth2, API Key, and Basic Auth.
             Configured directly in your OpenAPI security schemes.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="w-12 h-12 rounded-lg bg-error-subtle flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Web Application Firewall</h3>
+          <p class="text-foreground-muted">
+            A ModSecurity / OWASP CRS compatible WAF that compiles with your spec.
+            Request and response inspection, libinjection SQLi/XSS classifiers, and a
+            structured audit log.
           </p>
         </div>
 
