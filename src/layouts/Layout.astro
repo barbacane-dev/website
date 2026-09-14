@@ -7,6 +7,7 @@ interface Props {
   type?: 'website' | 'article';
   article?: {
     publishedTime: string;
+    modifiedTime?: string;
     author: string;
     tags: string[];
   };
@@ -34,6 +35,7 @@ const defaultStructuredData = type === 'article' && article
       "headline": title,
       "description": description,
       "datePublished": article.publishedTime,
+      "dateModified": article.modifiedTime || article.publishedTime,
       "author": {
         "@type": "Person",
         "name": article.author,
@@ -117,6 +119,7 @@ const structuredDataBlocks = customStructuredData
     {type === 'article' && article && (
       <>
         <meta property="article:published_time" content={article.publishedTime} />
+        {article.modifiedTime && <meta property="article:modified_time" content={article.modifiedTime} />}
         <meta property="article:author" content={article.author} />
         {article.tags.map((tag) => (
           <meta property="article:tag" content={tag} />

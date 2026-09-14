@@ -1,7 +1,8 @@
 ---
 title: "LiteLLM vs Portkey vs Barbacane: picking an AI gateway in 2026"
 description: "LiteLLM vs Portkey is the usual first comparison, but the real question is what the gateway does once it handles more than the LLM path. A head-to-head on LiteLLM, Portkey, and Barbacane: provider coverage, spec-first routing, MCP for the inbound direction, and composition with the rest of your API governance."
-publishDate: 2026-09-14
+publishDate: 2026-05-18
+updatedDate: 2026-09-14
 author: "Nicolas Dreno"
 tags: ["ai-gateway", "mcp-gateway", "portkey", "litellm", "comparison", "model-context-protocol", "ai-governance"]
 draft: false
