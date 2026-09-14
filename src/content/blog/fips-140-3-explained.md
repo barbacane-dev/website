@@ -1,7 +1,7 @@
 ---
 title: "FIPS 140-3, explained: what it validates and how to actually get it"
 description: "FIPS 140-3 shows up as a procurement gate for government, defense, finance, and healthcare, and it is widely misunderstood. What FIPS 140-3 validates (a cryptographic module, not your whole application), how it differs from 140-2, whether it is quantum-safe, and how Barbacane provides it without an OpenSSL FIPS build."
-publishDate: 2026-09-14
+publishDate: 2026-09-16
 author: "Nicolas Dreno"
 tags: ["barbacane", "api-gateway", "fips", "fips-140-3", "compliance", "security", "tls", "rustls"]
 ---
@@ -85,7 +85,7 @@ That is the honest framing. FIPS 140-3 answers exactly one question well, "is th
 
 ---
 
-### The boring conclusion
+### Narrower than it sounds
 
 FIPS 140-3 is narrower than it sounds and more procedural than it looks. It validates a cryptographic module at a level against a list of approved algorithms; for software, that means a Level 1 validated module and the discipline to only ever use approved cipher suites. It is not a product certification, it is not the same as being FedRAMP-authorized, and it is not post-quantum.
 
