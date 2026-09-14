@@ -91,7 +91,7 @@ It is not free. Measured through a real gateway with full CRS at paranoia level 
 
 ---
 
-### The boring conclusion
+### What this actually changes
 
 A WAF is only as good as the rules it is actually running, and the industry norm is to find out which rules those are at runtime, quietly, often too late. Barbacane moves that decision to compile time, where a failed build is cheap and a human is watching, and then seals the answer into the artifact you sign so it cannot drift afterward. The rules are validated against the same binary that enforces them. The injection classifiers are checked against the original. The response side runs, and every transaction can be audited.
 
