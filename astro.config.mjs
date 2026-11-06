@@ -7,7 +7,8 @@ export default defineConfig({
   site: 'https://barbacane.dev',
   trailingSlash: 'always',
   redirects: {
-    '/mcp/': '/ai/',
+    '/ai/': '/',
+    '/mcp/': '/',
   },
   markdown: {
     shikiConfig: {

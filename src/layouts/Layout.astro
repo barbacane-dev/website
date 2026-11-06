@@ -17,7 +17,7 @@ interface Props {
 
 const {
   title,
-  description = "Barbacane is the open-source, spec-driven API gateway. Compile your OpenAPI and AsyncAPI into a signed artifact and enforce it: routing, validation, auth, rate limits, a native WAF, and observability, all declared in the spec. The same middleware chain routes your LLM calls and exposes your APIs to agents as MCP tools. Rust-native, WASM plugins, AGPLv3.",
+  description = "Barbacane is the light, zero-trust API gateway. It compiles your OpenAPI or AsyncAPI spec into a signed artifact and enforces it on every request: only declared operations route, every input is validated, and undeclared headers never reach your services. One static Rust binary, no database, no sidecar, a native WAF. Open source under the AGPLv3.",
   type = 'website',
   article,
   ogImage: customOgImage,
@@ -150,7 +150,7 @@ const structuredDataBlocks = customStructuredData
           <!-- Desktop navigation -->
           <div class="hidden md:flex items-center gap-8">
             <a href="/platform/" class="text-foreground-muted hover:text-primary transition-colors">Platform teams</a>
-            <a href="/ai/" class="text-foreground-muted hover:text-primary transition-colors">AI teams</a>
+            <a href="/security/" class="text-foreground-muted hover:text-primary transition-colors">Security</a>
             <a href="https://docs.barbacane.dev" class="text-foreground-muted hover:text-primary transition-colors">Docs</a>
             <a href="/blog/" class="text-foreground-muted hover:text-primary transition-colors">Blog</a>
             <div class="relative group">
@@ -195,7 +195,7 @@ const structuredDataBlocks = customStructuredData
       <div id="mobile-menu" class="hidden md:hidden border-t border-themed">
         <div class="container-custom py-4 space-y-4">
           <a href="/platform/" class="block text-foreground-muted hover:text-primary transition-colors py-2">Platform teams</a>
-          <a href="/ai/" class="block text-foreground-muted hover:text-primary transition-colors py-2">AI teams</a>
+          <a href="/security/" class="block text-foreground-muted hover:text-primary transition-colors py-2">Security</a>
           <a href="https://docs.barbacane.dev" class="block text-foreground-muted hover:text-primary transition-colors py-2">Docs</a>
           <a href="/blog/" class="block text-foreground-muted hover:text-primary transition-colors py-2">Blog</a>
           <a href="/pricing/" class="block text-foreground-muted hover:text-primary transition-colors py-2">Licensing</a>
@@ -252,9 +252,9 @@ const structuredDataBlocks = customStructuredData
               <span class="font-bold text-xl text-gradient">Barbacane</span>
             </a>
             <p class="text-foreground-muted max-w-md">
-              The open-source, spec-driven API gateway. Compile your OpenAPI and
-              AsyncAPI into a signed artifact and enforce it, WAF and AI included.
-              Rust-native, spec-first, AGPLv3.
+              The light, zero-trust API gateway. Compile your OpenAPI and AsyncAPI
+              into a signed artifact and enforce it on every request. Rust-native,
+              spec-first, AGPLv3.
             </p>
           </div>
 
@@ -262,7 +262,7 @@ const structuredDataBlocks = customStructuredData
             <h4 class="font-semibold mb-4">Product</h4>
             <ul class="space-y-2 text-foreground-muted">
               <li><a href="/platform/" class="hover:text-primary transition-colors">Platform teams</a></li>
-              <li><a href="/ai/" class="hover:text-primary transition-colors">AI teams</a></li>
+              <li><a href="/security/" class="hover:text-primary transition-colors">Security</a></li>
               <li><a href="/blog/" class="hover:text-primary transition-colors">Blog</a></li>
               <li><a href="https://docs.barbacane.dev" class="hover:text-primary transition-colors">Documentation</a></li>
               <li><a href="https://github.com/barbacane-dev/barbacane" class="hover:text-primary transition-colors">GitHub</a></li>

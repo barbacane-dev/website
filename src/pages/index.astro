@@ -2,67 +2,145 @@
 import { Code } from 'astro:components';
 import Layout from '../layouts/Layout.astro';
 
-const mcpYaml = `# Enable MCP for the whole API
-x-barbacane-mcp:
-  enabled: true
-  server_name: Orders API
-  server_version: 1.0.0
+const specYaml = `# Applies to every operation
+x-barbacane-middlewares:
+  - name: oidc-auth
+    config:
+      issuer_url: https://auth.example.com
+      audience: orders-api
 
 paths:
-  /orders/{id}:
+  /orders/{orderId}:
     get:
       operationId: getOrder
-      summary: Fetch an order by id
       security:
         - bearerAuth: []
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: Order
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-
-  /admin/orders/purge:
-    delete:
-      operationId: purgeOrders
-      summary: Purge archived orders
-      # Hide this one from agents
-      x-barbacane-mcp:
-        enabled: false
-`;
-
-const aiProxyYaml = `paths:
-  /v1/chat/completions:
-    post:
-      operationId: chatCompletion
-      summary: Route LLM chat completion
+          schema: { type: string, format: uuid }
+        - name: x-tenant-id
+          in: header
+          required: true
+          schema: { type: string, pattern: "^[a-z0-9-]{3,32}$" }
+      x-barbacane-middlewares:
+        - name: rate-limit
+          config:
+            quota: 100
+            window: 60
+            partition_key: "context:auth.sub"
       x-barbacane-dispatch:
-        name: ai-proxy
+        name: http-upstream
         config:
-          provider: openai
-          model: gpt-4o
-          api_key: "\${OPENAI_API_KEY}"
-
-          # Tried in order on 5xx / timeout
-          fallback:
-            - provider: anthropic
-              model: claude-sonnet-4-20250514
-              api_key: "\${ANTHROPIC_API_KEY}"
-            - provider: ollama
-              model: llama3
-              base_url: http://ollama:11434
+          url: https://orders.internal.example
 `;
 
 const codeThemes = { light: 'github-light', dark: 'github-dark' };
+
+const icons = {
+  bolt: 'M13 10V3L4 14h7v7l9-11h-7z',
+  badge: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z',
+  shield: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+  check: 'M5 13l4 4L19 7',
+  checkCircle: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+  lock: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+  key: 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z',
+  gauge: 'M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z',
+  swap: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4',
+  chart: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+  terminal: 'M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+  copy: 'M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z',
+  document: 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z',
+  puzzle: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z',
+  server: 'M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2',
+};
+
+const pillars = [
+  {
+    name: 'Light',
+    color: 'primary',
+    icon: icons.bolt,
+    intro: 'Nothing on the request path that your API does not need.',
+    points: [
+      'One static binary of about 30 MB, shipped in a distroless, non-root image',
+      'No database, cache or sidecar: a data plane needs only its compiled artifact',
+      'Rust, Tokio and Hyper, with no garbage collector to pause your traffic',
+      'Route lookup in about 83 ns and full request validation in about 1.2 µs',
+    ],
+  },
+  {
+    name: 'Robust',
+    color: 'secondary',
+    icon: icons.badge,
+    intro: 'Mistakes fail the build, and the gateway holds up under pressure.',
+    points: [
+      'Unknown plugins, invalid configs, route conflicts and broken schemas are compile errors, not runtime surprises',
+      'A connection cap with load shedding, plus header-read and TLS handshake timeouts',
+      'Plugins run with memory, fuel and wall-clock limits, so a faulty one cannot take the gateway down',
+      'Data planes keep serving their last artifact when the control plane is unreachable',
+    ],
+  },
+  {
+    name: 'Zero trust',
+    color: 'accent',
+    icon: icons.shield,
+    intro: 'Every request is checked against the contract. Nothing is assumed.',
+    points: [
+      'Only declared operations route, and every parameter, header and body is validated',
+      'Request headers the spec does not declare are dropped before any plugin sees them',
+      'Identity headers come only from the auth plugins: a client cannot forge them',
+      'Artifacts are signed with Ed25519, and a pinned key makes the gateway refuse anything else',
+    ],
+  },
+];
+
+const enforced = [
+  {
+    title: 'Only this route exists',
+    text: 'Any path or method the spec does not declare gets a 404 or 405. There is no catch-all to forget about.',
+  },
+  {
+    title: 'Inputs match the schema',
+    text: 'orderId must be a UUID and x-tenant-id must match its pattern. Anything else is a 400, before the upstream sees it.',
+  },
+  {
+    title: 'The caller is verified',
+    text: 'oidc-auth validates the bearer token against the issuer and audience. No valid token, no request.',
+  },
+  {
+    title: 'Undeclared headers never arrive',
+    text: 'Headers outside the declared parameters, the security scheme and a fixed baseline are stripped at ingress, including any x-auth-* a client tries to send.',
+  },
+  {
+    title: 'Limits follow the identity',
+    text: 'The rate limit partitions on the authenticated subject, which a client cannot spoof.',
+  },
+];
+
+const features = [
+  { title: 'Request validation', icon: icons.checkCircle, color: 'primary', text: 'JSON Schema validation for paths, query strings, headers, cookies and bodies, with $ref resolution and format checks.' },
+  { title: 'Authentication', icon: icons.lock, color: 'secondary', text: 'JWT, OIDC, OAuth2 introspection, API keys, Basic and LDAP, wired to the security schemes in your spec.' },
+  { title: 'Authorization', icon: icons.key, color: 'accent', text: 'Consumer ACLs, inline CEL expressions and Open Policy Agent, evaluated per operation.' },
+  { title: 'Web application firewall', icon: icons.shield, color: 'primary', text: 'OWASP CRS compatible rules compiled into the artifact, inspecting requests and responses.' },
+  { title: 'Traffic control', icon: icons.gauge, color: 'secondary', text: 'Sliding-window rate limits, IP restriction, bot detection, request size limits and response caching.' },
+  { title: 'Transformation', icon: icons.swap, color: 'accent', text: 'Declarative rewrites of headers, query parameters, paths and JSON bodies, in both directions.' },
+  { title: 'Observability', icon: icons.chart, color: 'primary', text: 'Prometheus metrics, OpenTelemetry traces with W3C Trace Context, and structured JSON logs.' },
+  { title: 'Events and storage', icon: icons.terminal, color: 'secondary', text: 'AsyncAPI specs bridge HTTP to Kafka, NATS and AWS Lambda. S3 and WebSocket upstreams are first-class.' },
+  { title: 'FIPS 140-3 ready', icon: icons.badge, color: 'accent', text: 'TLS through rustls and AWS-LC, a NIST-certified FIPS 140-3 module. No OpenSSL dependency.' },
+  { title: 'Provenance', icon: icons.document, color: 'primary', text: 'Every artifact records its content hash and Git commit, and drift detection flags data planes running anything else.' },
+  { title: 'WebAssembly plugins', icon: icons.puzzle, color: 'secondary', text: '29 official plugins, and your own in any language that compiles to WebAssembly, each confined to the host functions it declares.' },
+  { title: 'Control and data planes', icon: icons.server, color: 'accent', text: 'A control plane compiles and distributes artifacts. Data planes hot-reload them without dropping connections.' },
+];
+
+const colorClasses: Record<string, { bg: string; text: string }> = {
+  primary: { bg: 'bg-primary-subtle', text: 'text-primary' },
+  secondary: { bg: 'bg-secondary-subtle', text: 'text-secondary' },
+  accent: { bg: 'bg-accent-subtle', text: 'text-accent' },
+};
 ---
 
-<Layout title="Barbacane - The spec-driven API gateway">
+<Layout title="Barbacane - The light, zero-trust API gateway">
   <!-- Hero Section -->
   <section class="section relative overflow-hidden">
     <div class="absolute inset-0 hero-gradient"></div>
@@ -70,20 +148,17 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
       <div class="max-w-4xl mx-auto text-center">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background-light border border-themed mb-8">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          <span class="text-sm text-foreground-muted">Open source &middot; Spec-driven API gateway &middot; AGPLv3</span>
+          <span class="text-sm text-foreground-muted">Open source &middot; Written in Rust &middot; AGPLv3</span>
         </div>
 
         <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
-          One spec.
-          <span class="text-gradient">Zero drift.</span>
+          The light, <span class="text-gradient">zero-trust</span> API gateway.
         </h1>
 
         <p class="text-lg sm:text-xl text-foreground-muted max-w-3xl mx-auto mb-10">
-          Barbacane compiles your OpenAPI and AsyncAPI into a signed artifact and
-          enforces it: routing, validation, authentication, rate limiting, a native
-          WAF, and observability, all declared in the spec you already write. The same
-          middleware chain routes your LLM calls and exposes your APIs to agents as
-          typed MCP tools.
+          Barbacane compiles your OpenAPI or AsyncAPI spec into a signed artifact and
+          enforces it on every request. Only what the spec declares gets through. One
+          static binary, no database, no sidecar.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -100,58 +175,113 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
             View on GitHub
           </a>
         </div>
+
+        <dl class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mt-14 text-left sm:text-center">
+          <div class="card py-4">
+            <dt class="text-sm text-foreground-muted">Route lookup, 1,000 routes</dt>
+            <dd class="text-2xl font-bold text-primary">~83 ns</dd>
+          </div>
+          <div class="card py-4">
+            <dt class="text-sm text-foreground-muted">Full request validation</dt>
+            <dd class="text-2xl font-bold text-secondary">~1.2 µs</dd>
+          </div>
+          <div class="card py-4">
+            <dt class="text-sm text-foreground-muted">Static gateway binary</dt>
+            <dd class="text-2xl font-bold text-accent">~30 MB</dd>
+          </div>
+        </dl>
+        <p class="text-xs text-foreground-muted mt-4">
+          Criterion micro-benchmarks on an Apple M4.
+          <a href="https://github.com/barbacane-dev/barbacane#performance" target="_blank" rel="noopener" class="underline hover:text-primary">Run them yourself</a>.
+        </p>
       </div>
     </div>
   </section>
 
-  <!-- Problem Section -->
-  <section class="section bg-background-light">
-    <div class="container-custom">
-      <div class="max-w-4xl mx-auto">
-        <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12">
-          The <span class="text-accent">problem</span> with traditional API gateways
-        </h2>
-
-        <div class="grid md:grid-cols-2 gap-8">
-          <div class="card border-error/20">
-            <div class="w-12 h-12 rounded-lg bg-error-subtle flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">Two sources of truth</h3>
-            <p class="text-foreground-muted">
-              Your OpenAPI spec defines your API, but your gateway has its own configuration.
-              They inevitably diverge, causing bugs and security issues.
-            </p>
-          </div>
-
-          <div class="card border-error/20">
-            <div class="w-12 h-12 rounded-lg bg-error-subtle flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">Wasted time reconciling</h3>
-            <p class="text-foreground-muted">
-              Teams spend hours syncing gateway config with API specs, debugging mismatches,
-              and fixing inconsistencies that shouldn't exist.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Solution Section -->
-  <section class="section">
+  <!-- Pillars Section -->
+  <section id="pillars" class="section bg-background-light">
     <div class="container-custom">
       <div class="max-w-4xl mx-auto text-center mb-16">
         <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-          The <span class="text-gradient">Barbacane</span> approach
+          Light. Robust. <span class="text-gradient">Zero trust.</span>
         </h2>
         <p class="text-xl text-foreground-muted">
-          One spec. Zero configuration drift. Automatic enforcement.
+          A gateway sits in front of everything you run. It should be the smallest, most
+          predictable and most suspicious component in the path.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-6">
+        {pillars.map((pillar) => (
+          <div class="card">
+            <div class={`w-12 h-12 rounded-lg ${colorClasses[pillar.color].bg} flex items-center justify-center mb-4`}>
+              <svg class={`w-6 h-6 ${colorClasses[pillar.color].text}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={pillar.icon}></path>
+              </svg>
+            </div>
+            <h3 class={`text-2xl font-bold mb-2 ${colorClasses[pillar.color].text}`}>{pillar.name}</h3>
+            <p class="text-foreground-muted mb-6">{pillar.intro}</p>
+            <ul class="space-y-3 text-foreground-muted text-sm">
+              {pillar.points.map((point) => (
+                <li class="flex items-start gap-2">
+                  <svg class={`w-5 h-5 ${colorClasses[pillar.color].text} mt-0.5 shrink-0`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icons.check}></path>
+                  </svg>
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Spec-as-contract Section -->
+  <section id="contract" class="section">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+            Only what the spec declares <span class="text-gradient">gets through</span>
+          </h2>
+          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
+            There is no separate gateway configuration to drift from your API. The
+            operation you document is the operation the gateway enforces, and anything
+            you did not document is refused.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8 items-start">
+          <div class="code-block-shiki rounded-lg text-sm overflow-auto">
+            <Code code={specYaml} lang="yaml" themes={codeThemes} />
+          </div>
+          <div class="space-y-6">
+            {enforced.map((item) => (
+              <div>
+                <h3 class="text-xl font-semibold mb-2">{item.title}</h3>
+                <p class="text-foreground-muted">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p class="text-center mt-10">
+          <a href="/security/" class="text-primary underline">How the trust model works, control by control</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works Section -->
+  <section class="section bg-background-light">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+          Spec in, <span class="text-gradient">signed artifact</span> out
+        </h2>
+        <p class="text-xl text-foreground-muted">
+          Checks happen when you build, not when a request fails in production.
         </p>
       </div>
 
@@ -160,10 +290,11 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
           <div class="w-16 h-16 rounded-2xl bg-primary-subtle flex items-center justify-center mx-auto mb-6">
             <span class="text-3xl">1</span>
           </div>
-          <h3 class="text-xl font-semibold mb-3">Write your API spec</h3>
+          <h3 class="text-xl font-semibold mb-3">Write the spec</h3>
           <p class="text-foreground-muted">
-            Use OpenAPI or AsyncAPI with <code class="text-primary">x-barbacane-*</code> extensions
-            for auth, rate limiting, and routing.
+            Your OpenAPI or AsyncAPI document, with <code class="text-primary">x-barbacane-*</code>
+            extensions for middlewares and upstreams. It stays a standard spec that every
+            other tool can read.
           </p>
         </div>
 
@@ -171,10 +302,11 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
           <div class="w-16 h-16 rounded-2xl bg-secondary-subtle flex items-center justify-center mx-auto mb-6">
             <span class="text-3xl">2</span>
           </div>
-          <h3 class="text-xl font-semibold mb-3">Compile to an artifact</h3>
+          <h3 class="text-xl font-semibold mb-3">Compile and sign</h3>
           <p class="text-foreground-muted">
-            Run <code class="text-secondary">barbacane compile</code> to generate an optimized
-            binary artifact. Validation happens at compile time.
+            <code class="text-secondary">barbacane compile</code> validates every route,
+            schema and plugin config, seals the plugins and WAF rules into one
+            <code class="text-secondary">.bca</code> artifact, and signs it.
           </p>
         </div>
 
@@ -182,18 +314,19 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
           <div class="w-16 h-16 rounded-2xl bg-accent-subtle flex items-center justify-center mx-auto mb-6">
             <span class="text-3xl">3</span>
           </div>
-          <h3 class="text-xl font-semibold mb-3">Deploy and run</h3>
+          <h3 class="text-xl font-semibold mb-3">Verify and serve</h3>
           <p class="text-foreground-muted">
-            Deploy the artifact to your gateway. Routing, validation, auth &mdash; everything
-            works exactly as specified.
+            <code class="text-accent">barbacane serve</code> checks the artifact's integrity
+            and signature before it serves a single request, then hot-reloads new versions
+            without dropping connections.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- WAF / Security Section -->
-  <section id="waf" class="section bg-background-light">
+  <!-- WAF Section -->
+  <section id="waf" class="section">
     <div class="container-custom">
       <div class="max-w-5xl mx-auto">
         <div class="text-center mb-12">
@@ -201,9 +334,9 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
             A <span class="text-gradient">WAF</span> that compiles with your spec
           </h2>
           <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
-            Run a ModSecurity / OWASP CRS compatible rule set as a native stage in the
-            pipeline. Rules are validated at compile time and sealed into the signed
-            artifact, so an unknown directive fails the build instead of silently never
+            A ModSecurity and OWASP CRS compatible rule set runs as a native stage in the
+            pipeline, with no sidecar. Rules are checked at compile time and sealed into
+            the artifact, so an unknown directive fails the build instead of silently never
             firing.
           </p>
         </div>
@@ -212,214 +345,31 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
           <div class="card">
             <h3 class="text-lg font-semibold mb-2">OWASP CRS, native</h3>
             <p class="text-foreground-muted text-sm">
-              Stock Core Rule Set v4 compiles in full, with SQL injection and XSS
-              classifiers running on a pure-Rust libinjection port, differential-tested
-              against the C library.
+              Stock Core Rule Set v4 compiles in full. SQL injection and XSS detection runs
+              on a memory-safe libinjection port that matches the C library on all 163,275
+              inputs of its test corpus.
             </p>
           </div>
           <div class="card">
-            <h3 class="text-lg font-semibold mb-2">Request and response</h3>
+            <h3 class="text-lg font-semibold mb-2">Both directions</h3>
             <p class="text-foreground-muted text-sm">
-              Inspect inbound requests and outbound responses (CRS phases 3 to 5), so a
-              leaked credential or stack trace is caught on the way out, not just on the
-              way in.
+              Requests and responses are inspected, so a leaked credential or stack trace is
+              caught on the way out, not just an attack on the way in.
             </p>
           </div>
           <div class="card">
-            <h3 class="text-lg font-semibold mb-2">Sealed and signed</h3>
+            <h3 class="text-lg font-semibold mb-2">Bound to the signature</h3>
             <p class="text-foreground-muted text-sm">
-              The rule set and its policy are folded into the artifact hash, so a signed
-              artifact cannot be switched from blocking to detection-only without breaking
-              the signature.
+              The rule set and its policy are part of the artifact hash, so a signed artifact
+              cannot be switched from blocking to detection-only without breaking the
+              signature.
             </p>
           </div>
           <div class="card">
             <h3 class="text-lg font-semibold mb-2">Audit log</h3>
             <p class="text-foreground-muted text-sm">
-              A structured per-transaction audit record on its own log target: matched
-              rules, anomaly scores, and the verdict, ready for a SIEM.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- MCP Quickstart Section -->
-  <section id="mcp-quickstart" class="section bg-background-light">
-    <div class="container-custom">
-      <div class="max-w-5xl mx-auto">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-            Your OpenAPI becomes an <span class="text-gradient">MCP server</span>
-          </h2>
-          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
-            Enable MCP once at the spec root and your existing API is agent-callable.
-            Authentication, rate limits, validation, and audit logging all apply to tool
-            calls, because they are just HTTP requests in disguise.
-          </p>
-        </div>
-
-        <div class="grid lg:grid-cols-2 gap-8 items-start">
-          <div class="code-block-shiki rounded-lg text-sm overflow-auto">
-            <Code code={mcpYaml} lang="yaml" themes={codeThemes} />
-          </div>
-
-          <div class="space-y-6">
-            <div>
-              <h3 class="text-xl font-semibold mb-2">Agents discover your tools</h3>
-              <p class="text-foreground-muted">
-                Barbacane exposes a JSON-RPC 2.0 MCP endpoint at
-                <code class="text-primary">/__barbacane/mcp</code>. Each operation becomes a
-                typed tool, with the name taken from <code class="text-primary">operationId</code>,
-                the description from <code class="text-primary">summary</code>, and input and
-                output schemas merged from your parameters, body, and responses.
-              </p>
-            </div>
-            <div>
-              <h3 class="text-xl font-semibold mb-2">Calls run through your middleware</h3>
-              <p class="text-foreground-muted">
-                Tool calls are HTTP requests. They pass through authentication, authorization,
-                rate limits, validation, transformations, and observability like any other
-                request. No shadow stack, no drift.
-              </p>
-            </div>
-            <div>
-              <h3 class="text-xl font-semibold mb-2">Opt out what agents should not see</h3>
-              <p class="text-foreground-muted">
-                By default every operation is a tool. Add
-                <code class="text-primary">x-barbacane-mcp: &#123; enabled: false &#125;</code>
-                to any operation you want to hide, such as admin endpoints or destructive
-                actions.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Outbound AI Proxy Section -->
-  <section id="ai-proxy-outbound" class="section">
-    <div class="container-custom">
-      <div class="max-w-5xl mx-auto">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-            Your app calls LLMs through <span class="text-gradient">one dispatcher</span>
-          </h2>
-          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
-            Route outbound LLM requests through OpenAI, Anthropic, or Ollama with provider
-            fallback, policy-driven targets, and the same middleware chain you use for
-            every other request.
-          </p>
-        </div>
-
-        <div class="grid lg:grid-cols-2 gap-8 items-start">
-          <div class="code-block-shiki rounded-lg text-sm overflow-auto">
-            <Code code={aiProxyYaml} lang="yaml" themes={codeThemes} />
-          </div>
-
-          <div class="space-y-6">
-            <div>
-              <h3 class="text-xl font-semibold mb-2">Clients send OpenAI format</h3>
-              <p class="text-foreground-muted">
-                The <code class="text-primary">ai-proxy</code> dispatcher exposes a
-                unified OpenAI-compatible API surface and translates per provider
-                internally. Pinned upstream API versions make breaking changes a
-                deliberate plugin upgrade, not a silent production incident.
-              </p>
-            </div>
-            <div>
-              <h3 class="text-xl font-semibold mb-2">Fallback on failure</h3>
-              <p class="text-foreground-muted">
-                When the primary provider returns 5xx or times out, the dispatcher tries
-                the next target in the fallback chain. 4xx errors (content policy, invalid
-                model) return directly to the client.
-              </p>
-            </div>
-            <div>
-              <h3 class="text-xl font-semibold mb-2">Policy-driven targets</h3>
-              <p class="text-foreground-muted">
-                Stack <code class="text-primary">cel</code> middleware rules to set
-                <code class="text-primary">ai.target</code> in context based on consumer
-                tier, scopes, or headers. Credentials stay in dispatcher config, never in
-                context.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-10 text-center">
-          <a href="/ai/" class="btn-secondary">Read the full AI gateway story</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- AI Governance Section -->
-  <section class="section bg-background-light">
-    <div class="container-custom">
-      <div class="max-w-5xl mx-auto">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-            AI governance, built in
-          </h2>
-          <p class="text-xl text-foreground-muted max-w-3xl mx-auto">
-            Four middlewares compose like any other Barbacane plugin. Named profiles,
-            CEL expressions, fail-closed on misconfiguration.
-          </p>
-        </div>
-
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="card">
-            <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold mb-2">Prompt guard</h3>
-            <p class="text-foreground-muted text-sm">
-              PII redaction, regex allow and deny lists, shape constraints on inbound prompts.
-              Shift-left validation at lint time.
-            </p>
-          </div>
-
-          <div class="card">
-            <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold mb-2">Token limits</h3>
-            <p class="text-foreground-muted text-sm">
-              Token-based sliding windows per consumer, per operation, per tenant.
-              Stop runaway agents before they cost you money.
-            </p>
-          </div>
-
-          <div class="card">
-            <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold mb-2">Cost tracking</h3>
-            <p class="text-foreground-muted text-sm">
-              Per-operation spend observability as Prometheus metrics. Budget alerts and
-              cost attribution across tenants and agents.
-            </p>
-          </div>
-
-          <div class="card">
-            <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold mb-2">Response guard</h3>
-            <p class="text-foreground-muted text-sm">
-              Output scrubbing, schema re-validation, and policy checks before responses
-              reach the agent. Fail closed on misconfiguration.
+              One structured record per transaction with the matched rules, anomaly scores
+              and verdict, ready for your SIEM.
             </p>
           </div>
         </div>
@@ -432,263 +382,25 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
     <div class="container-custom">
       <div class="max-w-4xl mx-auto text-center mb-16">
         <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-          One gateway for your <span class="text-gradient">APIs</span> and your <span class="text-gradient">agents</span>
+          Everything an <span class="text-gradient">API gateway</span> needs
         </h2>
         <p class="text-xl text-foreground-muted">
-          AI-native features on top of a production-grade, spec-first gateway.
-          Rust for speed and safety, WebAssembly plugins for extensibility.
+          Declared in the spec, checked at compile time, enforced on every request.
         </p>
       </div>
 
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 00.659 1.591L19 14.5M14.25 3.104c.251.023.501.05.75.082M19 14.5l-2.47 2.47a2.25 2.25 0 01-1.591.659H9.061a2.25 2.25 0 01-1.591-.659L5 14.5m14 0V17a2 2 0 01-2 2H7a2 2 0 01-2-2v-2.5"></path>
-            </svg>
+        {features.map((feature) => (
+          <div class="card">
+            <div class={`w-12 h-12 rounded-lg ${colorClasses[feature.color].bg} flex items-center justify-center mb-4`}>
+              <svg class={`w-6 h-6 ${colorClasses[feature.color].text}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={feature.icon}></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">{feature.title}</h3>
+            <p class="text-foreground-muted">{feature.text}</p>
           </div>
-          <h3 class="text-xl font-semibold mb-2">MCP server for AI agents</h3>
-          <p class="text-foreground-muted">
-            Expose your API operations as AI-callable tools via the Model Context Protocol.
-            AI agents discover and call endpoints through JSON-RPC 2.0, one extension to enable.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">Request Validation</h3>
-          <p class="text-foreground-muted">
-            Automatic JSON Schema validation for bodies, parameters, and headers
-            with built-in <code class="text-primary">$ref</code> resolution. Invalid requests never reach your backend.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">Authentication</h3>
-          <p class="text-foreground-muted">
-            Five built-in auth plugins: JWT, OIDC, OAuth2, API Key, and Basic Auth.
-            Configured directly in your OpenAPI security schemes.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-error-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">Web Application Firewall</h3>
-          <p class="text-foreground-muted">
-            A ModSecurity / OWASP CRS compatible WAF that compiles with your spec.
-            Request and response inspection, libinjection SQLi/XSS classifiers, and a
-            structured audit log.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">Blazing Fast</h3>
-          <p class="text-foreground-muted">
-            Sub-microsecond routing and validation. Built on Rust, Tokio,
-            and Hyper for maximum performance.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">Every plugin you need</h3>
-          <p class="text-foreground-muted">
-            A full suite of built-in WebAssembly plugins for auth, security, traffic
-            control, transformations, and observability. Sandboxed execution means a
-            faulty plugin cannot crash the gateway.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">Observability</h3>
-          <p class="text-foreground-muted">
-            Prometheus metrics, OpenTelemetry traces, and structured logging.
-            Full visibility into your API traffic.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">AsyncAPI & Event Bridging</h3>
-          <p class="text-foreground-muted">
-            Bridge HTTP to event-driven systems. Route requests to Kafka, NATS,
-            or AWS Lambda using AsyncAPI specs.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">Control & Data Plane Split</h3>
-          <p class="text-foreground-muted">
-            Autonomous data planes that run independently. Zero-downtime deployments
-            with hot-reload updates pushed from the control plane.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">Web UI</h3>
-          <p class="text-foreground-muted">
-            Visual control plane with syntax-highlighted spec viewer, drag-and-drop uploads,
-            build logs, data plane health monitoring, and one-click deployments.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">AI prompt guard</h3>
-          <p class="text-foreground-muted">
-            PII redaction, regex allow and deny lists, and schema constraints on inbound
-            prompts. Shift-left validation at lint time, fail-closed in production.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">Authorization</h3>
-          <p class="text-foreground-muted">
-            Policy-driven access control with inline CEL expressions, Open Policy Agent integration,
-            and consumer-based ACLs. Zero-trust at the gateway.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">Request Transformation</h3>
-          <p class="text-foreground-muted">
-            Declarative transformations for headers, query params, paths, and JSON bodies
-            before reaching your upstream. Variable interpolation with capture groups.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">AI token limits</h3>
-          <p class="text-foreground-muted">
-            Token-based sliding windows per consumer, per operation, per tenant. Stop
-            runaway agents before they cost you money.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">FIPS 140-3 Ready</h3>
-          <p class="text-foreground-muted">
-            Built on rustls with AWS-LC, a NIST-certified FIPS 140-3 cryptographic module.
-            Enable FIPS mode with a single feature flag &mdash; no OpenSSL dependency.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">AI cost tracking</h3>
-          <p class="text-foreground-muted">
-            Per-operation LLM spend as Prometheus metrics. Budget alerts and cost
-            attribution across tenants, teams, and agents.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-primary-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">WebSocket Proxy</h3>
-          <p class="text-foreground-muted">
-            Transparent WebSocket proxying with full middleware chain on the upgrade request.
-            Authentication, rate limiting, and observability apply to WebSocket connections.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-accent-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">Config Provenance</h3>
-          <p class="text-foreground-muted">
-            Every artifact embeds a SHA-256 fingerprint and Git commit provenance.
-            Continuous drift detection flags data planes running stale configurations.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="w-12 h-12 rounded-lg bg-secondary-subtle flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold mb-2">AI response guard</h3>
-          <p class="text-foreground-muted">
-            Output scrubbing, schema re-validation, and policy checks before responses
-            reach the agent. Fail closed on misconfiguration.
-          </p>
-        </div>
+        ))}
       </div>
     </div>
   </section>
@@ -698,10 +410,11 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
     <div class="container-custom">
       <div class="max-w-4xl mx-auto text-center mb-16">
         <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-          Enterprise-grade <span class="text-gradient">architecture</span>
+          Data planes that stand on their own
         </h2>
         <p class="text-xl text-foreground-muted">
-          Separate control plane and data plane for maximum resilience and flexibility.
+          The control plane builds and distributes artifacts. The data planes serve
+          traffic, and nothing on the request path depends on the control plane.
         </p>
       </div>
 
@@ -710,45 +423,26 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
           <div class="flex items-center gap-3 mb-4">
             <div class="w-10 h-10 rounded-lg bg-primary-subtle flex items-center justify-center">
               <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icons.server}></path>
               </svg>
             </div>
-            <h3 class="text-xl font-semibold">Control Plane</h3>
+            <h3 class="text-xl font-semibold">Control plane</h3>
           </div>
-          <p class="text-foreground-muted mb-4">
-            The management layer for your API gateway fleet. Handles configuration, compilation, and deployment orchestration.
-          </p>
           <ul class="space-y-2 text-foreground-muted text-sm">
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Web UI for visual management</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Plugin registry with schema validation</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Spec compilation and artifact builds</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Push deployments to data planes</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Artifact provenance and drift detection</span>
-            </li>
+            {[
+              'REST API for specs, builds and deployments, behind an admin token',
+              'Plugin registry with config schema validation',
+              'Spec compilation and artifact builds',
+              'Pushes new artifacts to connected data planes',
+              'Artifact provenance and drift detection',
+            ].map((item) => (
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icons.check}></path>
+                </svg>
+                <span>{item}</span>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -756,45 +450,26 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
           <div class="flex items-center gap-3 mb-4">
             <div class="w-10 h-10 rounded-lg bg-secondary-subtle flex items-center justify-center">
               <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icons.bolt}></path>
               </svg>
             </div>
-            <h3 class="text-xl font-semibold">Data Plane(s)</h3>
+            <h3 class="text-xl font-semibold">Data planes</h3>
           </div>
-          <p class="text-foreground-muted mb-4">
-            The runtime layer that handles actual API traffic. Fully autonomous &mdash; keeps running even if the control plane is down.
-          </p>
           <ul class="space-y-2 text-foreground-muted text-sm">
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Hot-reload without restarts</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Zero-downtime deployments</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>TLS termination, mTLS, and FIPS 140-3</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Resilient to control plane outages</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Dedicated admin API for health and provenance</span>
-            </li>
+            {[
+              'Run from a single artifact file, with or without a control plane',
+              'Hot reload without restarts or dropped connections',
+              'Keep serving the last artifact if the control plane goes away',
+              'TLS termination, mTLS to upstreams and FIPS 140-3 mode',
+              'Admin endpoints for health, metrics and provenance',
+            ].map((item) => (
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icons.check}></path>
+                </svg>
+                <span>{item}</span>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -802,7 +477,7 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
   </section>
 
   <!-- Use Cases Section -->
-  <section id="use-cases" class="section">
+  <section id="use-cases" class="section bg-background-light">
     <div class="container-custom">
       <div class="max-w-4xl mx-auto text-center mb-16">
         <h2 class="text-3xl sm:text-4xl font-bold mb-4">
@@ -811,111 +486,63 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
       </div>
 
       <div class="grid lg:grid-cols-3 gap-8">
-        <div class="card">
-          <h3 class="text-2xl font-bold mb-4 text-primary">Platform Teams</h3>
-          <p class="text-foreground-muted mb-6">
-            Building an internal developer platform? Barbacane enforces consistent API
-            standards and policies automatically.
-          </p>
-          <ul class="space-y-3 text-foreground-muted">
-            <li class="flex items-start gap-2">
-              <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Self-service API publishing</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Automatic policy enforcement</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Centralized observability</span>
-            </li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3 class="text-2xl font-bold mb-4 text-secondary">API Product Companies</h3>
-          <p class="text-foreground-muted mb-6">
-            Exposing public APIs? Barbacane ensures your contracts are strictly enforced
-            and your documentation is always accurate.
-          </p>
-          <ul class="space-y-3 text-foreground-muted">
-            <li class="flex items-start gap-2">
-              <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Contract-first development</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Always-accurate documentation</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <svg class="w-5 h-5 text-secondary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Version and lifecycle management</span>
-            </li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3 class="text-2xl font-bold mb-4 text-accent">Enterprises Modernizing</h3>
-          <p class="text-foreground-muted mb-6">
-            Migrating from legacy gateways? Barbacane's spec-first approach brings
-            order to complex API landscapes.
-          </p>
-          <ul class="space-y-3 text-foreground-muted">
-            <li class="flex items-start gap-2">
-              <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Gradual migration path</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Compliance-ready logging</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <svg class="w-5 h-5 text-accent mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Hybrid cloud support</span>
-            </li>
-          </ul>
-        </div>
+        {[
+          {
+            title: 'Platform teams',
+            color: 'primary',
+            text: 'Give every team the same enforced baseline: authentication, validation and limits that come from the spec, not from tickets.',
+            points: ['Self-service API publishing', 'Policies enforced, not reviewed', 'One observability story'],
+          },
+          {
+            title: 'API product companies',
+            color: 'secondary',
+            text: 'The contract you publish is the contract you enforce, so your documentation and your gateway can never disagree.',
+            points: ['Contract-first development', 'Documentation that cannot lie', 'Deprecation and sunset headers'],
+          },
+          {
+            title: 'Regulated environments',
+            color: 'accent',
+            text: 'Signed artifacts, provenance and audit logs give you evidence of what ran, built from components you can inspect.',
+            points: ['FIPS 140-3 ready TLS', 'Air-gapped and on-prem deployments', 'Audit-ready WAF logging'],
+          },
+        ].map((team) => (
+          <div class="card">
+            <h3 class={`text-2xl font-bold mb-4 ${colorClasses[team.color].text}`}>{team.title}</h3>
+            <p class="text-foreground-muted mb-6">{team.text}</p>
+            <ul class="space-y-3 text-foreground-muted">
+              {team.points.map((point) => (
+                <li class="flex items-start gap-2">
+                  <svg class={`w-5 h-5 ${colorClasses[team.color].text} mt-0.5 shrink-0`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icons.check}></path>
+                  </svg>
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     </div>
   </section>
 
   <!-- Open Source Section -->
-  <section class="section bg-background-light">
+  <section class="section">
     <div class="container-custom">
       <div class="max-w-4xl mx-auto text-center">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success-subtle border border-success/20 mb-8">
           <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icons.check}></path>
           </svg>
-          <span class="text-sm text-success">Open Source Core</span>
+          <span class="text-sm text-success">Open source</span>
         </div>
 
         <h2 class="text-3xl sm:text-4xl font-bold mb-4">
           No feature gating. No hidden enterprise tier.
         </h2>
         <p class="text-xl text-foreground-muted max-w-2xl mx-auto mb-8">
-          Barbacane is open source under the AGPLv3. Every feature is available to everyone.
-          Small teams and non-profits get a free commercial license. Larger organisations
-          can purchase a commercial license &mdash; see <a href="/pricing/" class="text-primary underline">pricing</a> for details.
+          Barbacane is open source under the AGPLv3, and every feature is available to
+          everyone. Small teams and non-profits get a free commercial license. Larger
+          organisations can buy one: see <a href="/pricing/" class="text-primary underline">pricing</a>.
         </p>
 
         <a href="https://github.com/barbacane-dev/barbacane" target="_blank" rel="noopener" class="btn-secondary">
@@ -934,10 +561,10 @@ const codeThemes = { light: 'github-light', dark: 'github-dark' };
       <div class="max-w-4xl mx-auto">
         <div class="card cta-gradient text-center p-12">
           <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-            Ready to simplify your API gateway?
+            Put your spec in front of your APIs
           </h2>
           <p class="text-xl text-foreground-muted max-w-2xl mx-auto mb-8">
-            Get started in minutes. Write your spec, compile, and deploy.
+            Write the spec, compile it, serve it. Minutes, not a migration project.
           </p>
 
           <div class="code-block rounded-lg p-4 mb-8 max-w-xl mx-auto">
