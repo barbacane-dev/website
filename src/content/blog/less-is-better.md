@@ -4,7 +4,7 @@ description: "Barbacane 1.0 ships with roughly 27,000 fewer lines than 0.12. Her
 publishDate: 2026-11-06
 author: "Nicolas Dreno"
 tags: ["barbacane", "security", "zero-trust", "engineering"]
-draft: true
+draft: false
 ---
 
 *The most secure line of code is the one that is not there.*
