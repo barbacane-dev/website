@@ -1,0 +1,180 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const boundaries = [
+  {
+    id: 'requests',
+    title: 'Requests',
+    lead: 'Every client is untrusted until the spec, an auth plugin and a policy say otherwise.',
+    controls: [
+      { name: 'Declared operations only', text: 'A path or method the spec does not declare gets a 404 or 405. There is no default route.' },
+      { name: 'Schema validation', text: 'Path, query, header and cookie parameters and request bodies are validated against their JSON Schemas, formats and patterns included, before any upstream sees them.' },
+      { name: 'Header allowlist', text: 'Only a fixed baseline, the declared header parameters and the headers of the applicable security schemes reach the middleware chain. Everything else is dropped at ingress.' },
+      { name: 'Unforgeable identity', text: 'The x-auth-* headers belong to the auth plugins: a spec cannot declare them (E1056), and the data plane drops any that a client sends.' },
+      { name: 'Authentication and authorization', text: 'JWT, OIDC, OAuth2 introspection, API keys, Basic and LDAP, then consumer ACLs, CEL expressions or Open Policy Agent, per operation.' },
+      { name: 'WAF', text: 'An OWASP CRS compatible rule set inspects requests and responses, in scoring or blocking mode, with a per-transaction audit log.' },
+      { name: 'Bounded resources', text: 'A connection cap sheds load, header-read and TLS handshake timeouts close slow clients, and rate limits partition on the authenticated identity.' },
+    ],
+  },
+  {
+    id: 'artifacts',
+    title: 'Artifacts',
+    lead: 'What runs is what you built, and you can prove it.',
+    controls: [
+      { name: 'Checked at build time', text: 'Unknown plugins, configs a plugin schema rejects, route conflicts, invalid schemas and plaintext upstream URLs (E1031) fail the compile.' },
+      { name: 'Content hash', text: 'One SHA-256 hash covers the specs, routes, plugins, their declared capabilities and the WAF policy. The data plane recomputes it on every load.' },
+      { name: 'Ed25519 signatures', text: 'The compiler signs the hash. Pin the public key and the data plane refuses any artifact that is unsigned or signed by anyone else.' },
+      { name: 'Provenance', text: 'Each artifact records the Git commit it was built from, and drift detection flags data planes that run anything other than the expected artifact.' },
+    ],
+  },
+  {
+    id: 'plugins',
+    title: 'Plugins',
+    lead: 'Extensions are code from someone else. They get a sandbox, not the keys.',
+    controls: [
+      { name: 'WebAssembly sandbox', text: 'Plugins cannot touch the host process, its memory or its file system. Memory, fuel and wall-clock limits stop a runaway plugin without stopping the gateway.' },
+      { name: 'Declared capabilities', text: 'A plugin lists the host functions it needs in its manifest, and the data plane refuses to load one that imports anything else.' },
+      { name: 'Body access on request', text: 'A middleware sees the request body only if its manifest asks for it.' },
+    ],
+  },
+  {
+    id: 'egress',
+    title: 'Egress',
+    lead: 'The gateway is not a pivot into your network.',
+    controls: [
+      { name: 'Internal targets blocked', text: 'Plugin HTTP calls, broker and directory connections and WebSocket upstreams to loopback, link-local, private and cloud metadata addresses are refused by default.' },
+      { name: 'No redirects', text: 'The plugin HTTP client does not follow redirects, so an allowed host cannot bounce a call to a forbidden one.' },
+      { name: 'TLS everywhere', text: 'rustls with AWS-LC, FIPS 140-3 ready, with mTLS to upstreams. No OpenSSL in the process.' },
+    ],
+  },
+  {
+    id: 'secrets',
+    title: 'Secrets',
+    lead: 'Credentials never travel inside an artifact.',
+    controls: [
+      { name: 'Resolved at runtime', text: 'Secrets are env:// or file:// references, resolved by the data plane when it loads the artifact.' },
+      { name: 'Confined files', text: 'file:// references must resolve inside one secrets directory, symbolic links included.' },
+      { name: 'Plaintext flagged', text: 'A literal value in a field a plugin marks as secret is reported by the compiler (E1070) and by the vacuum linter.' },
+    ],
+  },
+  {
+    id: 'control-plane',
+    title: 'Control plane',
+    lead: 'Management is off the request path and closed by default.',
+    controls: [
+      { name: 'Fails closed', text: 'The control plane does not start without an admin token, and every management route requires it.' },
+      { name: 'Origin allowlist', text: 'Cross-origin access is limited to the origins you configure.' },
+      { name: 'Data planes stand alone', text: 'A data plane keeps serving its last verified artifact when the control plane is unreachable.' },
+    ],
+  },
+  {
+    id: 'supply-chain',
+    title: 'Supply chain',
+    lead: 'The binary you run should be as inspectable as the spec you write.',
+    controls: [
+      { name: 'Signed images', text: 'Release images are signed keylessly with Sigstore cosign and carry a CycloneDX SBOM attestation.' },
+      { name: 'Minimal runtime', text: 'The data plane image is distroless and runs as a non-root user.' },
+      { name: 'Dependency gate', text: 'Every change runs cargo-deny for advisories, licenses, banned crates and sources.' },
+      { name: 'Adversarial testing', text: 'Fuzz targets cover the spec parser, artifact loader and validator, and an adversarial integration suite attacks the gateway on every change.' },
+    ],
+  },
+];
+
+const colors = ['primary', 'secondary', 'accent'];
+const colorClasses: Record<string, string> = {
+  primary: 'text-primary',
+  secondary: 'text-secondary',
+  accent: 'text-accent',
+};
+const check = 'M5 13l4 4L19 7';
+---
+
+<Layout
+  title="Zero trust by construction - Barbacane"
+  description="How Barbacane applies zero trust at every boundary of an API gateway: declared operations only, schema validation, a header allowlist, unforgeable identity, signed artifacts, sandboxed plugins with declared capabilities, blocked internal egress and runtime-only secrets."
+>
+  <!-- Hero -->
+  <section class="section relative overflow-hidden">
+    <div class="absolute inset-0 hero-gradient"></div>
+    <div class="container-custom relative">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background-light border border-themed mb-8">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span class="text-sm text-foreground-muted">Security model</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
+          Zero trust, <span class="text-gradient">by construction</span>
+        </h1>
+
+        <p class="text-lg sm:text-xl text-foreground-muted max-w-3xl mx-auto mb-10">
+          A gateway is the first thing an attacker reaches. Barbacane treats every
+          request, every artifact and every plugin as untrusted until it has been checked,
+          and the checks come from the spec you already maintain.
+        </p>
+
+        <div class="flex flex-wrap gap-3 justify-center">
+          {boundaries.map((b) => (
+            <a href={`#${b.id}`} class="px-4 py-2 rounded-full bg-background-light border border-themed text-sm text-foreground-muted hover:text-primary transition-colors">
+              {b.title}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {boundaries.map((b, index) => (
+    <section id={b.id} class={`section ${index % 2 === 0 ? 'bg-background-light' : ''}`}>
+      <div class="container-custom">
+        <div class="max-w-5xl mx-auto">
+          <div class="mb-10">
+            <h2 class={`text-3xl sm:text-4xl font-bold mb-3 ${colorClasses[colors[index % 3]]}`}>{b.title}</h2>
+            <p class="text-xl text-foreground-muted">{b.lead}</p>
+          </div>
+          <div class="grid md:grid-cols-2 gap-6">
+            {b.controls.map((c) => (
+              <div class="card">
+                <div class="flex items-start gap-3">
+                  <svg class={`w-5 h-5 mt-1 shrink-0 ${colorClasses[colors[index % 3]]}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={check}></path>
+                  </svg>
+                  <div>
+                    <h3 class="text-lg font-semibold mb-1">{c.name}</h3>
+                    <p class="text-foreground-muted text-sm">{c.text}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <!-- Reporting -->
+  <section class="section">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <div class="card cta-gradient text-center p-12">
+          <h2 class="text-3xl sm:text-4xl font-bold mb-4">Found a weakness?</h2>
+          <p class="text-xl text-foreground-muted max-w-2xl mx-auto mb-8">
+            Please report it privately to
+            <a href="mailto:security@barbacane.dev" class="text-primary underline">security@barbacane.dev</a>
+            rather than in a public issue. Our
+            <a href="https://github.com/barbacane-dev/barbacane/security/policy" target="_blank" rel="noopener" class="text-primary underline">security policy</a>
+            describes what to include and how we respond.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="https://docs.barbacane.dev/reference/configuration.html" class="btn-primary text-lg px-8 py-4">
+              Hardening reference
+            </a>
+            <a href="/" class="btn-secondary text-lg px-8 py-4">
+              Back to the overview
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

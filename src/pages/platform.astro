@@ -16,7 +16,7 @@ const faq = [
   },
   {
     question: "How does it deploy?",
-    answer: "A compiled artifact is a single binary. Run it anywhere: Kubernetes, bare metal, on-prem VMs, edge locations, air-gapped environments. The control plane and data planes are independent, so data planes keep serving even if the control plane is offline.",
+    answer: "The gateway is a single static binary that serves one compiled artifact. Run it anywhere: Kubernetes, bare metal, on-prem VMs, edge locations, air-gapped environments. The control plane and data planes are independent, so data planes keep serving even if the control plane is offline.",
   },
   {
     question: "AGPLv3. Can I use it commercially?",
@@ -27,8 +27,8 @@ const faq = [
     answer: "Yes. Barbacane reads AsyncAPI specs and bridges HTTP to Kafka, NATS, or AWS Lambda. The same spec-first, compile-safe workflow applies.",
   },
   {
-    question: "Does this extend to AI traffic?",
-    answer: "Yes. The same spec-first model covers outbound LLM routing (via the ai-proxy dispatcher) and inbound MCP for AI agents. Platform teams often use Barbacane for all three on the same gateway. See /ai/ for that side of the story.",
+    question: "What does zero trust mean for a gateway?",
+    answer: "Nothing is allowed because it was not forbidden. Only the operations in your spec route, every parameter, header and body is validated against its schema, request headers the spec does not declare are dropped before any plugin runs, and identity headers can only come from the auth plugins. Artifacts are signed, and plugins can only call the host functions they declare. See /security/ for the full model.",
   },
 ];
 
@@ -200,8 +200,8 @@ const faqStructuredData = {
             </div>
             <h3 class="text-lg font-semibold mb-2">Authentication</h3>
             <p class="text-foreground-muted text-sm">
-              Five built-in auth plugins: JWT, OIDC, OAuth2, API Key, Basic. Configured
-              directly in your OpenAPI security schemes.
+              Six built-in auth plugins: JWT, OIDC, OAuth2, API key, Basic and LDAP,
+              wired to the security schemes in your OpenAPI spec.
             </p>
           </div>
 
@@ -428,8 +428,9 @@ const faqStructuredData = {
           <div class="card">
             <h3 class="text-lg font-semibold mb-2">How does it deploy?</h3>
             <p class="text-foreground-muted">
-              A compiled artifact is a single binary. Run it anywhere: Kubernetes, bare
-              metal, on-prem VMs, edge locations, air-gapped environments. The control
+              The gateway is a single static binary that serves one compiled artifact.
+              Run it anywhere: Kubernetes, bare metal, on-prem VMs, edge locations,
+              air-gapped environments. The control
               plane and data planes are independent, so data planes keep serving even if
               the control plane is offline.
             </p>
@@ -455,13 +456,15 @@ const faqStructuredData = {
           </div>
 
           <div class="card">
-            <h3 class="text-lg font-semibold mb-2">Does this extend to AI traffic?</h3>
+            <h3 class="text-lg font-semibold mb-2">What does zero trust mean for a gateway?</h3>
             <p class="text-foreground-muted">
-              Yes. The same spec-first model covers outbound LLM routing (via the
-              <code class="text-primary">ai-proxy</code> dispatcher) and inbound MCP for
-              AI agents. Platform teams often use Barbacane for all three on the same
-              gateway. See <a href="/ai/" class="text-primary hover:underline">the AI
-              gateway page</a> for that side of the story.
+              Nothing is allowed because it was not forbidden. Only the operations in your
+              spec route, every parameter, header and body is validated against its schema,
+              request headers the spec does not declare are dropped before any plugin runs,
+              and identity headers can only come from the auth plugins. Artifacts are
+              signed, and plugins can only call the host functions they declare. See
+              <a href="/security/" class="text-primary hover:underline">security</a> for the
+              full model.
             </p>
           </div>
         </div>
