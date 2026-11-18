@@ -4,7 +4,7 @@ description: "A scanner stopped our release over a library Barbacane never loads
 publishDate: 2026-11-18
 author: "Nicolas Dreno"
 tags: ["barbacane", "security", "containers", "supply-chain", "engineering"]
-draft: true
+draft: false
 ---
 
 *A container image is a list of things you trust. Keep the list short, and know where every line comes from.*
