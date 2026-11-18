@@ -73,7 +73,8 @@ const boundaries = [
     lead: 'The binary you run should be as inspectable as the spec you write.',
     controls: [
       { name: 'Signed images', text: 'Release images are signed keylessly with Sigstore cosign and carry a CycloneDX SBOM attestation.' },
-      { name: 'Minimal runtime', text: 'The data plane image is distroless and runs as a non-root user.' },
+      { name: 'Minimal runtime', text: 'The data plane and control plane images hold the binary, glibc, libgcc and CA certificates, from a set of Wolfi packages pinned by checksum: no shell, no package manager, a non-root user.' },
+      { name: 'Scanned every night', text: 'The binaries carry their dependency list, so image scanners see every crate, and a nightly scan covers the runtime base and the latest release images.' },
       { name: 'Dependency gate', text: 'Every change runs cargo-deny for advisories, licenses, banned crates and sources.' },
       { name: 'Adversarial testing', text: 'Fuzz targets cover the spec parser, artifact loader and validator, and an adversarial integration suite attacks the gateway on every change.' },
     ],
