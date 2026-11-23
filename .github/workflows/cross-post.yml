@@ -15,13 +15,19 @@ on:
         type: boolean
         default: true
 
+permissions:
+  contents: read
+
 jobs:
   cross-post:
     runs-on: ubuntu-latest
+    # Its deployment rules decide which branches may use the credentials.
+    environment: cross-post
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 2
+          persist-credentials: false
 
       - uses: actions/setup-node@v5
         with:
@@ -33,18 +39,24 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+      # Inputs reach the shell as environment variables, never as text in the
+      # script, and the scripts refuse a slug that is not a post's.
       - name: Cross-post
         env:
           DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
           BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
           BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+          EVENT_NAME: ${{ github.event_name }}
+          SLUG: ${{ github.event.inputs.slug }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            ARGS="--slug=${{ github.event.inputs.slug }}"
-            if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
-              ARGS="$ARGS --dry-run"
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            args=("--slug=$SLUG")
+            if [ "$DRY_RUN" = "true" ]; then
+              args+=(--dry-run)
             fi
-            node scripts/cross-post.mjs $ARGS
+            node scripts/cross-post.mjs "${args[@]}"
           else
             node scripts/cross-post.mjs
           fi

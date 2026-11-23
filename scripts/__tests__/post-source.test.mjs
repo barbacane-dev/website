@@ -1,9 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { writeFileSync, mkdtempSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { absolutizeLinks, loadArticle } from '../lib/post-source.mjs';
+import {
+  absolutizeLinks,
+  detectNewlyPublished,
+  loadArticle,
+  resolvePosts,
+} from '../lib/post-source.mjs';
 
 test('absolutizeLinks rewrites markdown link targets', () => {
   const out = absolutizeLinks('See [the docs](/docs/) for more.', 'https://example.com');
@@ -80,5 +86,38 @@ test('loadArticle handles missing tags as empty array', () => {
     assert.deepEqual(loadArticle(filePath).tags, []);
   } finally {
     rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detectNewlyPublished runs no shell syntax found in a file name', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cross-post-test-'));
+  const cwd = process.cwd();
+  const git = (...args) =>
+    execFileSync('git', ['-c', 'user.name=test', '-c', 'user.email=test@example.invalid', ...args], {
+      cwd: dir,
+      stdio: 'pipe',
+    });
+  const post = 'src/content/blog/$(touch pwned).md';
+  try {
+    git('init', '-q');
+    mkdirSync(join(dir, 'src/content/blog'), { recursive: true });
+    writeFileSync(join(dir, post), '---\ntitle: "x"\ndraft: true\n---\nBody.\n');
+    git('add', '-A');
+    git('commit', '-q', '-m', 'draft');
+    writeFileSync(join(dir, post), '---\ntitle: "x"\ndraft: false\n---\nBody.\n');
+    git('commit', '-q', '-am', 'publish');
+
+    process.chdir(dir);
+    assert.deepEqual(detectNewlyPublished(), [post]);
+    assert.equal(existsSync(join(dir, 'pwned')), false, 'the file name ran as a command');
+  } finally {
+    process.chdir(cwd);
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('resolvePosts refuses a slug that is not lower-case words and hyphens', () => {
+  for (const slug of ['../../package', 'a/b', 'Upper', 'two words', '-lead', 'trail-']) {
+    assert.throws(() => resolvePosts({ slug }), /invalid slug/, slug);
   }
 });
