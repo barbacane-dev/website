@@ -2,12 +2,15 @@
 // Channel-agnostic: returns a normalized Article shape that each
 // channel module then converts into its own API payload.
 
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import matter from 'gray-matter';
 
 export const POSTS_DIR = 'src/content/blog';
+
+// A post's slug: lower-case letters and digits, in words joined by hyphens.
+const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 export const SITE_URL = 'https://barbacane.dev';
 
 // Rewrites site-relative markdown links and HTML src/href attributes to
@@ -40,7 +43,7 @@ export function loadArticle(filePath) {
 export function detectNewlyPublished() {
   let changed;
   try {
-    changed = execSync(`git diff --name-only HEAD^ HEAD -- '${POSTS_DIR}/*.md'`, {
+    changed = execFileSync('git', ['diff', '--name-only', 'HEAD^', 'HEAD', '--', `${POSTS_DIR}/*.md`], {
       encoding: 'utf8',
     })
       .trim()
@@ -58,7 +61,10 @@ export function detectNewlyPublished() {
 
     let prevDraft = true;
     try {
-      const prevContent = execSync(`git show HEAD^:${f}`, { encoding: 'utf8' });
+      const prevContent = execFileSync('git', ['show', `HEAD^:${f}`], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      });
       prevDraft = matter(prevContent).data.draft !== false;
     } catch {
       prevDraft = true;
@@ -72,6 +78,7 @@ export function detectNewlyPublished() {
 // Resolves a slug or a list of file paths into existing post file paths.
 export function resolvePosts({ slug, files }) {
   if (slug) {
+    if (!SLUG.test(slug)) throw new Error(`invalid slug: ${JSON.stringify(slug)}`);
     const path = join(POSTS_DIR, `${slug}.md`);
     if (!existsSync(path)) throw new Error(`Not found: ${path}`);
     return [path];

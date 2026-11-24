@@ -14,11 +14,18 @@ on:
         type: boolean
         default: true
 
+permissions:
+  contents: read
+
 jobs:
   update:
     runs-on: ubuntu-latest
+    # Its deployment rules decide which branches may use the credentials.
+    environment: cross-post
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v5
         with:
@@ -27,15 +34,21 @@ jobs:
 
       - run: npm ci
 
+      # Inputs reach the shell as environment variables, never as text in the
+      # script, and the scripts refuse a slug that is not a post's.
       - name: Update cross-posts
         env:
           DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+          SLUG: ${{ github.event.inputs.slug }}
+          CHANNELS: ${{ github.event.inputs.channels }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
         run: |
-          ARGS="--slug=${{ github.event.inputs.slug }}"
-          if [ -n "${{ github.event.inputs.channels }}" ]; then
-            ARGS="$ARGS --channels=${{ github.event.inputs.channels }}"
+          set -euo pipefail
+          args=("--slug=$SLUG")
+          if [ -n "$CHANNELS" ]; then
+            args+=("--channels=$CHANNELS")
           fi
-          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
-            ARGS="$ARGS --dry-run"
+          if [ "$DRY_RUN" = "true" ]; then
+            args+=(--dry-run)
           fi
-          node scripts/update-cross-post.mjs $ARGS
+          node scripts/update-cross-post.mjs "${args[@]}"
